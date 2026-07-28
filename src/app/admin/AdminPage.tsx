@@ -12,6 +12,7 @@ import {
   HelpCircle,
 } from "lucide-react";
 import { useAuth } from "./AuthProvider";
+import { MarkdownEditor } from "./MarkdownEditor";
 import {
   adminDeleteBlogPost,
   adminDeleteFaq,
@@ -405,7 +406,11 @@ function BlogAdmin() {
           )}
         </Field>
         <Field label="Body">
-          <textarea className={`${inputClass} min-h-[220px]`} value={editing.body || ""} onChange={(e) => setEditing({ ...editing, body: e.target.value })} />
+          <MarkdownEditor
+            value={editing.body || ""}
+            onChange={(body) => setEditing({ ...editing, body })}
+            minHeightClass="min-h-[220px]"
+          />
         </Field>
         <label className="flex items-center gap-2 text-sm text-white/60">
           <input
@@ -610,7 +615,11 @@ function GuidesAdmin() {
           <textarea className={`${inputClass} min-h-[80px]`} value={editing.excerpt || ""} onChange={(e) => setEditing({ ...editing, excerpt: e.target.value })} />
         </Field>
         <Field label="Body">
-          <textarea className={`${inputClass} min-h-[180px]`} value={editing.body || ""} onChange={(e) => setEditing({ ...editing, body: e.target.value })} />
+          <MarkdownEditor
+            value={editing.body || ""}
+            onChange={(body) => setEditing({ ...editing, body })}
+            minHeightClass="min-h-[180px]"
+          />
         </Field>
         <Field label="Sort order">
           <input
