@@ -492,7 +492,7 @@ function Nav({ currentPage, onNavigate }: { currentPage: Page; onNavigate: (p: P
       <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
         <button onClick={() => onNavigate("home")} className="flex items-center flex-shrink-0">
-          <TroveLogo className="h-8 w-auto object-contain" />
+          <TroveLogo className="h-12 w-auto object-contain" />
         </button>
 
         {/* Desktop Nav */}
@@ -596,9 +596,6 @@ function Nav({ currentPage, onNavigate }: { currentPage: Page; onNavigate: (p: P
 
         {/* CTA */}
         <div className="hidden md:flex items-center gap-2">
-          <button className="text-sm text-white/50 hover:text-white transition-colors px-3 py-2 font-medium" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-            Sign In
-          </button>
           <button
             onClick={() => openContact(onNavigate, { reason: "Request Demo" })}
             className="relative overflow-hidden text-sm font-semibold bg-[#1B6FE8] hover:bg-[#2B7FF8] text-white px-4 py-2 rounded-lg transition-all group"
@@ -1127,12 +1124,35 @@ function HomePage({ onNavigate }: { onNavigate: (p: Page) => void }) {
                 Trusted Technology Partners
               </p>
             </div>
-            <div className="flex items-center justify-center gap-14 flex-wrap">
-              {["Constellis", "QumulusAI", "LomaHipe"].map((partner) => (
-                <div key={partner} className="text-[22px] font-bold text-[#9CA3AF] hover:text-[#6B7280] transition-colors cursor-pointer tracking-tight" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                  {partner}
-                </div>
-              ))}
+            <div className="flex items-center justify-center gap-10 md:gap-14 flex-wrap">
+              {[
+                { name: "Constellis", href: "https://constellis.com/" },
+                { name: "QumulusAI", href: "https://www.qumulusai.com/" },
+                { name: "LomaHipe", href: null },
+                { name: "DScern", href: "https://www.dscern.tech/" },
+              ].map((partner) =>
+                partner.href ? (
+                  <a
+                    key={partner.name}
+                    href={partner.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-[22px] font-bold text-[#9CA3AF] hover:text-[#6B7280] transition-colors tracking-tight"
+                    style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                  >
+                    {partner.name}
+                  </a>
+                ) : (
+                  <button
+                    key={partner.name}
+                    onClick={() => onNavigate("partners")}
+                    className="text-[22px] font-bold text-[#9CA3AF] hover:text-[#6B7280] transition-colors tracking-tight"
+                    style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                  >
+                    {partner.name}
+                  </button>
+                )
+              )}
             </div>
           </FadeUp>
         </div>
@@ -2518,7 +2538,7 @@ function PartnersPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
       description: "LEXSO is developed jointly with Constellis, a global risk management and security firm, for complex physical security environments. Constellis brings deep operational expertise in protective services, security staffing, and intelligence. LEXSO brings the AI command layer that fuses those operations into a unified intelligence picture.",
       detail: "Constellis operates across six continents, supporting government, corporate, and high-risk commercial clients. The LEXSO × Constellis partnership translates AI-native security capabilities into the field-tested operational playbooks Constellis deploys at scale.",
       capabilities: ["Joint product development", "Field deployment expertise", "Government & commercial reach", "Global operational footprint"],
-      url: null,
+      url: "https://constellis.com/",
     },
     {
       id: "qumulusai",
@@ -2536,7 +2556,7 @@ function PartnersPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
       description: "QumulusAI is a global HPC and AI infrastructure provider building a differentiated position as a data center closer to the edge, with multiple regional data centers reducing latency and improving access to high-performance computing.",
       detail: "Trove-AI is QumulusAI's sole trusted AI and security-posture provider, delivering AI-as-a-Service and Algorithm-as-a-Service through the QumulusAI platform. This exclusive relationship positions Trove-AI's DeepSense-powered stack as the AI intelligence layer across QumulusAI's distributed infrastructure footprint.",
       capabilities: ["AI-as-a-Service delivery", "Algorithm-as-a-Service", "Edge-proximate infrastructure", "Security posture management"],
-      url: null,
+      url: "https://www.qumulusai.com/",
     },
     {
       id: "lomahipe",
@@ -2554,7 +2574,25 @@ function PartnersPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
       description: "LomaHipe is Trove-AI's sister initiative building a health data trust for secure, verifiable exchange of health data across organizations. Trove-AI's VellumGuard is integrated into the LomaHipe health data trust as its secure communications layer.",
       detail: "VellumGuard governs node enrollment, authentication, and audit for every exchange within the LomaHipe trust network. LomaHipe is hosted at its own permanent domain and is not part of the trove-ai.com site. It operates as an independent initiative with its own governance, identity, and stakeholder relationships.",
       capabilities: ["Node enrollment & authentication", "Zero-trust audit logging", "Verifiable data exchange", "Cross-org health data governance"],
-      url: "lomahipe.com",
+      url: "https://lomahipe.com",
+    },
+    {
+      id: "dscern",
+      name: "DScern",
+      label: "DScern",
+      type: "Strategic Partner",
+      typeColor: "#F59E0B",
+      region: "Federal / Defense / Intel",
+      domain: "Secure AI & Analytics",
+      logo: "D",
+      logoColor: "#F59E0B",
+      product: "DeepSense",
+      productColor: "#1B6FE8",
+      headline: "The right information, at the right time.",
+      description: "DScern designs and delivers secure AI, analytics, and custom software solutions that turn complex data into trusted, actionable insight at the speed of mission. Their work centers on modern platforms, AI-enabled tools, and humans in the loop.",
+      detail: "DScern partners with federal civilian, defense, and intelligence organizations supporting national security missions. The relationship with Trove-AI extends DeepSense-powered capabilities into environments where clarity, sound judgment, and principled leadership matter as much as the technology itself.",
+      capabilities: ["Secure AI & analytics delivery", "Federal civilian mission support", "Defense & intelligence partnerships", "Decision systems with human oversight"],
+      url: "https://www.dscern.tech/",
     },
   ];
 
@@ -2581,7 +2619,7 @@ function PartnersPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
                 Select partners.<br /><span className="text-[#1B6FE8]">Deeper integration.</span>
               </h1>
               <p className="mt-6 text-white/50 text-lg leading-relaxed max-w-2xl" style={{ fontFamily: "Inter, sans-serif" }}>
-                Trove-AI's partner ecosystem includes Constellis, QumulusAI, and LomaHipe, the health data trust initiative VellumGuard is integrated into.
+                Trove-AI&apos;s partner ecosystem includes Constellis, QumulusAI, LomaHipe, and DScern — extending secure AI into physical security, infrastructure, health data trust, and national security missions.
               </p>
               <p className="mt-3 text-white/42 text-sm leading-relaxed max-w-xl" style={{ fontFamily: "Inter, sans-serif" }}>
                 Trove-AI works with select partners to extend its products into markets and infrastructure it does not serve alone.
@@ -2681,10 +2719,18 @@ function PartnersPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
                           {partner.detail}
                         </p>
                         {partner.url && (
-                          <div className="mt-4 flex items-center gap-2 text-sm text-[#8B5CF6]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+                          <a
+                            href={partner.url.startsWith("http") ? partner.url : `https://${partner.url}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="mt-4 inline-flex items-center gap-2 text-sm hover:opacity-80 transition-opacity"
+                            style={{ color: partner.logoColor, fontFamily: "'Space Grotesk', sans-serif" }}
+                          >
                             <Globe className="w-3.5 h-3.5" />
-                            <span className="font-medium">{partner.url}</span>
-                          </div>
+                            <span className="font-medium underline underline-offset-2">
+                              {partner.url.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+                            </span>
+                          </a>
                         )}
                       </div>
 
@@ -2728,7 +2774,7 @@ function PartnersPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 {[
-                  { n: "3", label: "Active partners", note: "All strategic" },
+                  { n: "4", label: "Active partners", note: "All strategic" },
                   { n: "1", label: "Exclusive AI provider", note: "QumulusAI" },
                   { n: "2", label: "Joint products", note: "LEXSO, VellumGuard" },
                   { n: "0", label: "Reseller relationships", note: "By design" },
