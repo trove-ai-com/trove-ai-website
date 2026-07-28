@@ -2580,7 +2580,7 @@ function PartnersPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
       id: "dscern",
       name: "DScern",
       label: "DScern",
-      type: "Strategic Partner",
+      type: "Sister Initiative",
       typeColor: "#F59E0B",
       region: "Federal / Defense / Intel",
       domain: "Secure AI & Analytics",
@@ -2589,8 +2589,8 @@ function PartnersPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
       product: "DeepSense",
       productColor: "#1B6FE8",
       headline: "The right information, at the right time.",
-      description: "DScern designs and delivers secure AI, analytics, and custom software solutions that turn complex data into trusted, actionable insight at the speed of mission. Their work centers on modern platforms, AI-enabled tools, and humans in the loop.",
-      detail: "DScern partners with federal civilian, defense, and intelligence organizations supporting national security missions. The relationship with Trove-AI extends DeepSense-powered capabilities into environments where clarity, sound judgment, and principled leadership matter as much as the technology itself.",
+      description: "DScern is Trove-AI's sister initiative designing and delivering secure AI, analytics, and custom software solutions that turn complex data into trusted, actionable insight at the speed of mission — modern platforms, AI-enabled tools, and humans in the loop.",
+      detail: "DScern works with federal civilian, defense, and intelligence organizations supporting national security missions. Hosted at its own domain, dscern.tech, it operates as an independent initiative with its own governance and identity while extending DeepSense-powered capabilities into environments where clarity, sound judgment, and principled leadership matter as much as the technology itself.",
       capabilities: ["Secure AI & analytics delivery", "Federal civilian mission support", "Defense & intelligence partnerships", "Decision systems with human oversight"],
       url: "https://www.dscern.tech/",
     },
@@ -2619,7 +2619,7 @@ function PartnersPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
                 Select partners.<br /><span className="text-[#1B6FE8]">Deeper integration.</span>
               </h1>
               <p className="mt-6 text-white/50 text-lg leading-relaxed max-w-2xl" style={{ fontFamily: "Inter, sans-serif" }}>
-                Trove-AI&apos;s partner ecosystem includes Constellis, QumulusAI, LomaHipe, and DScern — extending secure AI into physical security, infrastructure, health data trust, and national security missions.
+                Trove-AI&apos;s ecosystem includes Constellis, QumulusAI, and sister initiatives LomaHipe and DScern — extending secure AI into physical security, infrastructure, health data trust, and national security missions.
               </p>
               <p className="mt-3 text-white/42 text-sm leading-relaxed max-w-xl" style={{ fontFamily: "Inter, sans-serif" }}>
                 Trove-AI works with select partners to extend its products into markets and infrastructure it does not serve alone.
