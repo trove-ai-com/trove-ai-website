@@ -4198,7 +4198,9 @@ export default function App() {
     <AuthProvider>
     <div className="min-h-screen overflow-x-hidden" style={{ fontFamily: "Inter, sans-serif", background: "#040D1A" }}>
       <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[200] focus:bg-[#1B6FE8] focus:text-white focus:px-4 focus:py-2 focus:rounded-lg focus:text-sm focus:font-semibold">Skip to main content</a>
-      {currentPage !== "admin" && <Nav currentPage={currentPage} onNavigate={navigate} />}
+      {currentPage !== "admin" && currentPage !== "blog-composer" && (
+        <Nav currentPage={currentPage} onNavigate={navigate} />
+      )}
       <main id="main-content">
         {currentPage === "home" && <HomePage onNavigate={navigate} />}
         {currentPage === "solutions" && <SolutionsPage onNavigate={navigate} />}
