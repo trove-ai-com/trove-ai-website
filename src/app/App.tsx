@@ -14,8 +14,10 @@ import { AdminPage } from "@/app/admin/AdminPage";
 import { AuthProvider } from "@/app/admin/AuthProvider";
 import { ResourcesPageLive } from "@/app/content/ResourcesPageLive";
 import { ArticlePageLive, BlogPageLive } from "@/app/content/BlogPagesLive";
+import { ContactPage } from "@/app/contact/ContactPage";
+import { openContact } from "@/app/contact/openContact";
 
-type Page = "home" | "solutions" | "about" | "industries" | "resources" | "blog" | "blog-composer" | "admin" | "partners" | "visualiq" | "deepsenseiq" | "careiq" | "cyberiq" | "vellumguard" | "lexso" | `article-${string}`;
+type Page = "home" | "solutions" | "about" | "industries" | "resources" | "blog" | "blog-composer" | "admin" | "partners" | "contact" | "visualiq" | "deepsenseiq" | "careiq" | "cyberiq" | "vellumguard" | "lexso" | `article-${string}`;
 
 function TroveLogo({ className }: { className?: string }) {
   const [src, setSrc] = useState<string>("");
@@ -268,7 +270,17 @@ function SharedFooter({ onNavigate }: { onNavigate: (p: Page | string) => void }
               <ul className="space-y-2.5">
                 {col.links.map((link) => (
                   <li key={link}>
-                    <button className="text-white/42 hover:text-white/70 text-sm transition-colors text-left">{link}</button>
+                    <button
+                      onClick={() => {
+                        if (link === "About") onNavigate("about");
+                        else if (link === "Partners") onNavigate("partners");
+                        else if (link === "Contact") onNavigate("contact");
+                        else if (link === "Blog") onNavigate("blog");
+                      }}
+                      className="text-white/42 hover:text-white/70 text-sm transition-colors text-left"
+                    >
+                      {link}
+                    </button>
                   </li>
                 ))}
               </ul>
@@ -587,7 +599,11 @@ function Nav({ currentPage, onNavigate }: { currentPage: Page; onNavigate: (p: P
           <button className="text-sm text-white/50 hover:text-white transition-colors px-3 py-2 font-medium" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
             Sign In
           </button>
-          <button className="relative overflow-hidden text-sm font-semibold bg-[#1B6FE8] hover:bg-[#2B7FF8] text-white px-4 py-2 rounded-lg transition-all group" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+          <button
+            onClick={() => openContact(onNavigate, { reason: "Request Demo" })}
+            className="relative overflow-hidden text-sm font-semibold bg-[#1B6FE8] hover:bg-[#2B7FF8] text-white px-4 py-2 rounded-lg transition-all group"
+            style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+          >
             <span className="relative z-10">Request Demo</span>
             <span className="absolute inset-0 translate-x-[-100%] group-hover:translate-x-[100%] bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-500" />
           </button>
@@ -629,7 +645,11 @@ function Nav({ currentPage, onNavigate }: { currentPage: Page; onNavigate: (p: P
               </div>
             ))}
             <div className="mt-3 pt-3 border-t border-white/[0.06]">
-              <button className="w-full bg-[#1B6FE8] text-white text-sm font-semibold py-3 rounded-xl" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+              <button
+                onClick={() => { openContact(onNavigate, { reason: "Request Demo" }); setMenuOpen(false); }}
+                className="w-full bg-[#1B6FE8] text-white text-sm font-semibold py-3 rounded-xl"
+                style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+              >
                 Request Demo
               </button>
             </div>
@@ -1134,6 +1154,7 @@ function HomePage({ onNavigate }: { onNavigate: (p: Page) => void }) {
             </p>
             <div className="mt-9 flex gap-4 justify-center flex-wrap">
               <button
+                onClick={() => openContact(onNavigate, { reason: "Request Demo" })}
                 className="relative overflow-hidden flex items-center gap-2 bg-[#10B981] hover:bg-[#059669] text-white font-semibold px-8 py-3.5 rounded-xl transition-all hover:-translate-y-0.5 text-sm shadow-lg shadow-[#10B981]/20 group"
                 style={{ fontFamily: "'Space Grotesk', sans-serif" }}
               >
@@ -1141,6 +1162,7 @@ function HomePage({ onNavigate }: { onNavigate: (p: Page) => void }) {
                 <span className="absolute inset-0 translate-x-[-100%] group-hover:translate-x-[100%] bg-gradient-to-r from-transparent via-white/10 to-transparent transition-transform duration-500" />
               </button>
               <button
+                onClick={() => openContact(onNavigate, { reason: "General Inquiry" })}
                 className="flex items-center gap-2 border border-white/[0.13] hover:border-white/25 text-white/55 hover:text-white font-semibold px-8 py-3.5 rounded-xl transition-all text-sm"
                 style={{ fontFamily: "'Space Grotesk', sans-serif" }}
               >
@@ -1323,12 +1345,14 @@ function SolutionsPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
 
                 <div className="flex gap-3">
                   <button
+                    onClick={() => onNavigate(selected.id as Page)}
                     className="flex items-center gap-2 text-sm font-semibold px-5 py-2.5 rounded-xl transition-all hover:-translate-y-0.5"
                     style={{ background: `${selected.color}18`, color: selected.color, fontFamily: "'Space Grotesk', sans-serif" }}
                   >
                     Full Capabilities <ArrowRight className="w-4 h-4" />
                   </button>
                   <button
+                    onClick={() => openContact(onNavigate, { reason: "Request Demo", message: `I'd like a demo of ${selected.name}.` })}
                     className="text-sm font-semibold px-5 py-2.5 rounded-xl transition-all border border-white/[0.1] text-white/40 hover:text-white hover:border-white/20"
                     style={{ fontFamily: "'Space Grotesk', sans-serif" }}
                   >
@@ -1804,6 +1828,12 @@ function IndustriesPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
                 </div>
 
                 <button
+                  onClick={() =>
+                    openContact(onNavigate, {
+                      reason: "General Inquiry",
+                      message: `I'd like to talk to a ${active} specialist about Trove-AI solutions for our environment.`,
+                    })
+                  }
                   className="flex items-center gap-2 bg-[#1B6FE8] hover:bg-[#2B7FF8] text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-all hover:-translate-y-0.5"
                   style={{ fontFamily: "'Space Grotesk', sans-serif" }}
                 >
@@ -4128,6 +4158,9 @@ export default function App() {
         {currentPage === "solutions" && <SolutionsPage onNavigate={navigate} />}
         {currentPage === "about" && <AboutPage onNavigate={navigate} />}
         {currentPage === "industries" && <IndustriesPage onNavigate={navigate} />}
+        {currentPage === "contact" && (
+          <ContactPage onNavigate={navigate} FadeUp={FadeUp} SharedFooter={SharedFooter} />
+        )}
         {currentPage === "resources" && (
           <ResourcesPageLive onNavigate={navigate} FadeUp={FadeUp} SharedFooter={SharedFooter} />
         )}
