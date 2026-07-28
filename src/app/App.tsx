@@ -108,7 +108,7 @@ const products = [
     border: "rgba(20,184,166,0.22)",
     bg: "rgba(20,184,166,0.05)",
     Icon: Lock,
-    capabilities: ["Zero trust architecture", "Node-to-node trust", "Encrypted transfers", "Audit trail"],
+    capabilities: ["Zero trust architecture", "Node-to-node trust", "Post-quantum encrypted transfers", "Audit trail"],
   },
   {
     id: "lexso",
