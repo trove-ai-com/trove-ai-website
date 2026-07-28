@@ -1483,7 +1483,7 @@ function AboutPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
     },
     {
       q: "What is DeepSense?",
-      a: "DeepSense is Trove-AI's proprietary core AI engine, combining synthetic data generation and multimodal AI to power the IQ product family.",
+      a: "DeepSense is Trove-AI's proprietary core AI engine, using multimodal AI to power the IQ product family.",
     },
   ];
 
@@ -1545,7 +1545,7 @@ function AboutPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
           <div className="space-y-0">
             {[
               { year: "2023", title: "Founded", desc: "Trove-AI founded by AI and machine learning engineers with experience in U.S. intelligence community applications." },
-              { year: "2023", title: "DeepSense v1", desc: "First version of the DeepSense engine, combining synthetic data generation and multimodal AI, deployed in initial environments." },
+              { year: "2023", title: "DeepSense v1", desc: "First version of the DeepSense multimodal AI engine, deployed in initial environments." },
               { year: "2023", title: "VisualIQ Launch", desc: "VisualIQ released as the first product in the IQ family, enabling camera intelligence with zero hardware replacement." },
               { year: "2024", title: "Platform Expansion", desc: "DeepSenseIQ, CareIQ, and CyberIQ added to the platform. Healthcare, education, and cyber verticals enter general availability." },
               { year: "2024", title: "LEXSO: Joint Development", desc: "LEXSO developed in partnership with Constellis as a layered extended security operations platform for complex physical security environments." },

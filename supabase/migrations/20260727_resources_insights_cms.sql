@@ -380,6 +380,6 @@ The training data problem for classified AI is straightforward to describe and d
 Synthetic generation under differential privacy guarantees addresses this by producing training sets that statistically resemble real data without encoding any specific real event. Adversarial validation then tests whether the synthetic set can be used to re-identify any real-world signature. Sets that fail this test are discarded. What remains is a training corpus that can be used freely within the network, without any of the handling risk that real data would carry.$q$,
   $q$Feb 2025$q$,
   $q$7 min$q$,
-  array[$q$Synthetic Data$q$, $q$Classified$q$, $q$CyberIQ$q$],
+  array[$q$Classified$q$, $q$CyberIQ$q$],
   true
 );

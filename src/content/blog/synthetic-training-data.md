@@ -6,7 +6,6 @@ excerpt: "When real incident data can't leave a classified network, synthetic ge
 date: "Feb 2025"
 readTime: "7 min"
 tags:
-  - Synthetic Data
   - Classified
   - CyberIQ
 published: true
