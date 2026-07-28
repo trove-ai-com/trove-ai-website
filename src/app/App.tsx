@@ -2806,7 +2806,12 @@ function PartnersPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
               </div>
               <div className="relative z-10 flex flex-col items-start lg:items-end gap-4">
                 <button
-                  onClick={() => onNavigate("about")}
+                  onClick={() =>
+                    openContact(onNavigate, {
+                      reason: "Partnership",
+                      message: "I'm interested in partnering with Trove-AI.",
+                    })
+                  }
                   className="flex items-center gap-2 bg-[#1B6FE8] hover:bg-[#1557c4] text-white font-semibold px-7 py-3.5 rounded-xl text-sm transition-all hover:-translate-y-0.5"
                   style={{ fontFamily: "'Space Grotesk', sans-serif" }}
                 >
