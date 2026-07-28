@@ -65,6 +65,9 @@ export function BlogPageLive({ onNavigate, FadeUp, SharedFooter }: SharedProps) 
                   </p>
                   <div className="mt-8 flex flex-wrap items-center gap-4">
                     <button
+                      onClick={() =>
+                        document.getElementById("recent-articles")?.scrollIntoView({ behavior: "smooth", block: "start" })
+                      }
                       className="flex items-center gap-2 text-sm font-semibold text-[#10B981] hover:gap-3 transition-all"
                       style={{ fontFamily: "'Space Grotesk', sans-serif" }}
                     >
@@ -142,7 +145,7 @@ export function BlogPageLive({ onNavigate, FadeUp, SharedFooter }: SharedProps) 
         </section>
       )}
 
-      <section className="py-16">
+      <section id="recent-articles" className="py-16 scroll-mt-20">
         <div className="max-w-7xl mx-auto px-6">
           <FadeUp>
             <div className="flex items-center justify-between mb-8 flex-wrap gap-4">

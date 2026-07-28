@@ -103,7 +103,7 @@ const products = [
     name: "VellumGuard",
     tagline: "Zero Trust Communications",
     description:
-      "Node-to-node encrypted communications with verifiable trust at every layer. Built for defense, government, and healthcare data sovereignty requirements.",
+      "Node-to-node post-quantum encrypted communications with verifiable trust at every layer. Built for defense, government, and healthcare data sovereignty requirements.",
     color: "#14B8A6",
     border: "rgba(20,184,166,0.22)",
     bg: "rgba(20,184,166,0.05)",
@@ -1549,7 +1549,7 @@ function AboutPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
               { year: "2023", title: "VisualIQ Launch", desc: "VisualIQ released as the first product in the IQ family, enabling camera intelligence with zero hardware replacement." },
               { year: "2024", title: "Platform Expansion", desc: "DeepSenseIQ, CareIQ, and CyberIQ added to the platform. Healthcare, education, and cyber verticals enter general availability." },
               { year: "2024", title: "LEXSO: Joint Development", desc: "LEXSO developed in partnership with Constellis as a layered extended security operations platform for complex physical security environments." },
-              { year: "2024", title: "VellumGuard Launch", desc: "Platform completed with VellumGuard, delivering zero trust node-to-node encrypted communications for the most sensitive environments." },
+              { year: "2024", title: "VellumGuard Launch", desc: "Platform completed with VellumGuard, delivering zero trust node-to-node post-quantum encrypted communications for the most sensitive environments." },
               { year: "2025", title: "DeepSense v3: Enterprise Scale", desc: "DeepSense v3 reaches enterprise scale, powering the full IQ product family with sub-50ms inference and air-gap deployment certification." },
             ].map((item, i, arr) => (
               <FadeUp key={`${item.year}-${item.title}`} delay={i * 0.07}>
@@ -2356,6 +2356,9 @@ function BlogPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
                   </p>
                   <div className="mt-8 flex flex-wrap items-center gap-4">
                     <button
+                      onClick={() =>
+                        document.getElementById("recent-articles")?.scrollIntoView({ behavior: "smooth", block: "start" })
+                      }
                       className="flex items-center gap-2 text-sm font-semibold text-[#10B981] hover:gap-3 transition-all"
                       style={{ fontFamily: "'Space Grotesk', sans-serif" }}
                     >
@@ -2414,7 +2417,7 @@ function BlogPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
       </section>
 
       {/* Article index */}
-      <section className="py-16">
+      <section id="recent-articles" className="py-16 scroll-mt-20">
         <div className="max-w-7xl mx-auto px-6">
           <FadeUp>
             <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
@@ -3149,7 +3152,7 @@ function ProductStubPage({ productId, onNavigate }: { productId: string; onNavig
       ],
     },
     vellumguard: {
-      summary: "Node-to-node encrypted communications with verifiable trust at every layer. VellumGuard governs node enrollment, authentication, and audit for every exchange, built for defense, government, and healthcare data sovereignty requirements.",
+      summary: "Node-to-node post-quantum encrypted communications with verifiable trust at every layer. VellumGuard governs node enrollment, authentication, and audit for every exchange, built for defense, government, and healthcare data sovereignty requirements.",
       sections: [
         { title: "Zero Trust Architecture", items: ["Node-to-node trust verification on every exchange", "No single compromised credential unlocks a network", "Behavioral and contextual cross-validation on access", "Zone-level context before authorization is granted"] },
         { title: "Encrypted Transport", items: ["Secure evidence and alert transport between sites", "Intermittent connectivity support for remote nodes", "LomaHipe health data trust integration", "Verifiable exchange with full audit trail"] },
