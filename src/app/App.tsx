@@ -10,9 +10,12 @@ import {
 } from "lucide-react";
 import { allInsights } from "@/app/blog/loadArticles";
 import { ArticleBody } from "@/app/blog/ArticleBody";
-import { BlogComposerPage } from "@/app/blog/BlogComposerPage";
+import { AdminPage } from "@/app/admin/AdminPage";
+import { AuthProvider } from "@/app/admin/AuthProvider";
+import { ResourcesPageLive } from "@/app/content/ResourcesPageLive";
+import { ArticlePageLive, BlogPageLive } from "@/app/content/BlogPagesLive";
 
-type Page = "home" | "solutions" | "about" | "industries" | "resources" | "blog" | "blog-composer" | "partners" | "visualiq" | "deepsenseiq" | "careiq" | "cyberiq" | "vellumguard" | "lexso" | `article-${number}`;
+type Page = "home" | "solutions" | "about" | "industries" | "resources" | "blog" | "blog-composer" | "admin" | "partners" | "visualiq" | "deepsenseiq" | "careiq" | "cyberiq" | "vellumguard" | "lexso" | `article-${string}`;
 
 function TroveLogo({ className }: { className?: string }) {
   const [src, setSrc] = useState<string>("");
@@ -240,7 +243,7 @@ function SectionLabel({ children, dark = true }: { children: ReactNode; dark?: b
   );
 }
 
-function SharedFooter({ onNavigate }: { onNavigate: (p: Page) => void }) {
+function SharedFooter({ onNavigate }: { onNavigate: (p: Page | string) => void }) {
   return (
     <footer className="bg-[#030A14] border-t border-white/[0.05] py-16">
       <div className="max-w-7xl mx-auto px-6">
@@ -274,10 +277,16 @@ function SharedFooter({ onNavigate }: { onNavigate: (p: Page) => void }) {
         </div>
         <div className="border-t border-white/[0.05] pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-white/38 text-xs">© 2025 Trove-AI, Inc. All rights reserved.</p>
-          <div className="flex gap-6">
+          <div className="flex gap-6 items-center">
             {["Privacy Policy", "Terms of Service", "Cookie Policy"].map((link) => (
               <button key={link} className="text-white/38 hover:text-white/40 text-xs transition-colors">{link}</button>
             ))}
+            <button
+              onClick={() => onNavigate("admin")}
+              className="text-white/25 hover:text-white/50 text-xs transition-colors"
+            >
+              Admin
+            </button>
           </div>
         </div>
       </div>
@@ -4099,25 +4108,37 @@ function VellumGuardPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>("home");
 
-  const navigate = (page: Page) => {
-    setCurrentPage(page);
+  const navigate = (page: Page | string) => {
+    setCurrentPage(page as Page);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const articleSlug =
+    typeof currentPage === "string" && currentPage.startsWith("article-")
+      ? currentPage.replace("article-", "")
+      : null;
+
   return (
+    <AuthProvider>
     <div className="min-h-screen overflow-x-hidden" style={{ fontFamily: "Inter, sans-serif", background: "#040D1A" }}>
       <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[200] focus:bg-[#1B6FE8] focus:text-white focus:px-4 focus:py-2 focus:rounded-lg focus:text-sm focus:font-semibold">Skip to main content</a>
-      <Nav currentPage={currentPage} onNavigate={navigate} />
+      {currentPage !== "admin" && <Nav currentPage={currentPage} onNavigate={navigate} />}
       <main id="main-content">
         {currentPage === "home" && <HomePage onNavigate={navigate} />}
         {currentPage === "solutions" && <SolutionsPage onNavigate={navigate} />}
         {currentPage === "about" && <AboutPage onNavigate={navigate} />}
         {currentPage === "industries" && <IndustriesPage onNavigate={navigate} />}
-        {currentPage === "resources" && <ResourcesPage onNavigate={navigate} />}
-        {currentPage === "blog" && <BlogPage onNavigate={navigate} />}
-        {currentPage === "blog-composer" && <BlogComposerPage onNavigate={navigate} />}
-        {typeof currentPage === "string" && currentPage.startsWith("article-") && (
-          <ArticlePage articleId={parseInt(currentPage.replace("article-", ""), 10)} onNavigate={navigate} />
+        {currentPage === "resources" && (
+          <ResourcesPageLive onNavigate={navigate} FadeUp={FadeUp} SharedFooter={SharedFooter} />
+        )}
+        {currentPage === "blog" && (
+          <BlogPageLive onNavigate={navigate} FadeUp={FadeUp} SharedFooter={SharedFooter} />
+        )}
+        {(currentPage === "blog-composer" || currentPage === "admin") && (
+          <AdminPage onNavigate={navigate} />
+        )}
+        {articleSlug && (
+          <ArticlePageLive articleSlug={articleSlug} onNavigate={navigate} FadeUp={FadeUp} SharedFooter={SharedFooter} />
         )}
         {currentPage === "partners" && <PartnersPage onNavigate={navigate} />}
         {currentPage === "visualiq" && <VisualIQPage onNavigate={navigate} />}
@@ -4128,5 +4149,6 @@ export default function App() {
         {currentPage === "lexso" && <ProductStubPage productId="lexso" onNavigate={navigate} />}
       </main>
     </div>
+    </AuthProvider>
   );
 }
