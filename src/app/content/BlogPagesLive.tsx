@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ArrowRight, ChevronRight, PenLine } from "lucide-react";
+import { ArrowRight, ChevronRight } from "lucide-react";
 import { fetchBlogPostBySlug, fetchPublishedBlogPosts } from "@/app/content/api";
 import type { BlogPost } from "@/app/content/types";
 import { ArticleBody } from "@/app/blog/ArticleBody";
@@ -69,13 +69,6 @@ export function BlogPageLive({ onNavigate, FadeUp, SharedFooter }: SharedProps) 
                       style={{ fontFamily: "'Space Grotesk', sans-serif" }}
                     >
                       Browse recent articles <ArrowRight className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => onNavigate("admin")}
-                      className="flex items-center gap-2 text-sm font-medium text-white/45 hover:text-white border border-white/[0.1] hover:border-white/25 rounded-full px-4 py-2 transition-all"
-                      style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-                    >
-                      <PenLine className="w-3.5 h-3.5" /> Manage content
                     </button>
                   </div>
                 </div>

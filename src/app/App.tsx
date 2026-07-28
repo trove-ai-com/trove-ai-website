@@ -6,7 +6,7 @@ import {
   Camera, Radio, Heart, Shield, Lock, Building,
   Network, Users, ArrowRight, Menu, X, ChevronDown,
   Zap, Globe, Check, Brain, Award, ChevronRight, Cpu,
-  Activity, Layers, PenLine,
+  Activity, Layers,
 } from "lucide-react";
 import { allInsights } from "@/app/blog/loadArticles";
 import { ArticleBody } from "@/app/blog/ArticleBody";
@@ -1126,9 +1126,9 @@ function HomePage({ onNavigate }: { onNavigate: (p: Page) => void }) {
             </div>
             <div className="flex items-center justify-center gap-10 md:gap-14 flex-wrap">
               {[
-                { name: "Constellis", href: "https://constellis.com/" },
+                { name: "Constellis", href: "https://www.constellis.com/" },
                 { name: "QumulusAI", href: "https://www.qumulusai.com/" },
-                { name: "LomaHipe", href: null },
+                { name: "LomaHipe", href: "https://www.lomahipe.com/" },
                 { name: "DScern", href: "https://www.dscern.tech/" },
               ].map((partner) =>
                 partner.href ? (
@@ -2361,13 +2361,6 @@ function BlogPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
                     >
                       Browse recent articles <ArrowRight className="w-4 h-4" />
                     </button>
-                    <button
-                      onClick={() => onNavigate("blog-composer")}
-                      className="flex items-center gap-2 text-sm font-medium text-white/45 hover:text-white border border-white/[0.1] hover:border-white/25 rounded-full px-4 py-2 transition-all"
-                      style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-                    >
-                      <PenLine className="w-3.5 h-3.5" /> Write article
-                    </button>
                   </div>
                 </div>
                 <div className="hidden lg:flex flex-col items-end justify-end gap-1.5">
@@ -2538,7 +2531,7 @@ function PartnersPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
       description: "LEXSO is developed jointly with Constellis, a global risk management and security firm, for complex physical security environments. Constellis brings deep operational expertise in protective services, security staffing, and intelligence. LEXSO brings the AI command layer that fuses those operations into a unified intelligence picture.",
       detail: "Constellis operates across six continents, supporting government, corporate, and high-risk commercial clients. The LEXSO × Constellis partnership translates AI-native security capabilities into the field-tested operational playbooks Constellis deploys at scale.",
       capabilities: ["Joint product development", "Field deployment expertise", "Government & commercial reach", "Global operational footprint"],
-      url: "https://constellis.com/",
+      url: "https://www.constellis.com/",
     },
     {
       id: "qumulusai",
@@ -2574,7 +2567,7 @@ function PartnersPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
       description: "LomaHipe is Trove-AI's sister initiative building a health data trust for secure, verifiable exchange of health data across organizations. Trove-AI's VellumGuard is integrated into the LomaHipe health data trust as its secure communications layer.",
       detail: "VellumGuard governs node enrollment, authentication, and audit for every exchange within the LomaHipe trust network. LomaHipe is hosted at its own permanent domain and is not part of the trove-ai.com site. It operates as an independent initiative with its own governance, identity, and stakeholder relationships.",
       capabilities: ["Node enrollment & authentication", "Zero-trust audit logging", "Verifiable data exchange", "Cross-org health data governance"],
-      url: "https://lomahipe.com",
+      url: "https://www.lomahipe.com/",
     },
     {
       id: "dscern",
@@ -4021,7 +4014,7 @@ function VellumGuardPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
     { q: "Does VellumGuard replace a traditional VPN?", a: "No. A VPN can give a connected device broad access once inside the network. VellumGuard treats every endpoint as a controlled node that must be known, approved, and governed by policy before any communication occurs." },
     { q: "How does VellumGuard handle intermittent connectivity?", a: "It queues messages and files locally when a node is disconnected, and automatically retries and recovers once connectivity resumes." },
     { q: "Can a revoked node reconnect automatically?", a: "No. Revocation blocks further exchange attempts from that node until an administrator re-enrolls and re-authorizes it." },
-    { q: "What is LomaHipe?", a: "LomaHipe is Trove-AI's sister initiative building a health data trust for secure, verifiable exchange of health data across organizations. It is hosted at its own domain, lomahipe.com, separate from trove-ai.com." },
+    { q: "What is LomaHipe?", a: "LomaHipe is Trove-AI's sister initiative building a health data trust for secure, verifiable exchange of health data across organizations. It is hosted at its own domain, www.lomahipe.com, separate from trove-ai.com." },
     { q: "Is this the same as CyberIQ for healthcare?", a: "No. CyberIQ addresses IT security monitoring for a health system's own network, logs, and applications. VellumGuard is the secure communications layer governing data exchange between institutions participating in the LomaHipe health data trust." },
   ];
 
