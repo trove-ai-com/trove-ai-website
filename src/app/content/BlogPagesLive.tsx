@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ArrowRight, ChevronRight } from "lucide-react";
 import { fetchBlogPostBySlug, fetchPublishedBlogPosts } from "@/app/content/api";
-import type { BlogPost } from "@/app/content/types";
+import { POST_TYPE_LABELS, POST_TYPE_OPTIONS, type BlogPost, type PostType } from "@/app/content/types";
 import { ArticleBody } from "@/app/blog/ArticleBody";
 
 type Nav = (page: string) => void;
@@ -15,6 +15,7 @@ type SharedProps = {
 export function BlogPageLive({ onNavigate, FadeUp, SharedFooter }: SharedProps) {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [activeProduct, setActiveProduct] = useState("All");
+  const [activeType, setActiveType] = useState<"All" | PostType>("All");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,7 +26,9 @@ export function BlogPageLive({ onNavigate, FadeUp, SharedFooter }: SharedProps) 
   }, []);
 
   const productFilters = ["All", ...Array.from(new Set(posts.map((a) => a.product)))];
-  const filtered = activeProduct === "All" ? posts : posts.filter((a) => a.product === activeProduct);
+  const filtered = posts
+    .filter((a) => activeProduct === "All" || a.product === activeProduct)
+    .filter((a) => activeType === "All" || (a.post_type || "insight") === activeType);
   const featured = posts[0];
 
   if (loading) {
@@ -172,6 +175,20 @@ export function BlogPageLive({ onNavigate, FadeUp, SharedFooter }: SharedProps) 
                   </button>
                 ))}
               </div>
+            </div>
+            <div className="flex items-center gap-1.5 flex-wrap mb-8">
+              {(["All", ...POST_TYPE_OPTIONS] as const).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setActiveType(t)}
+                  className={`text-[11px] px-3 py-1.5 rounded-full border transition-colors ${
+                    activeType === t ? "bg-[#10B981]/15 border-[#10B981]/40 text-[#10B981]" : "border-white/[0.08] text-white/40 hover:text-white/60"
+                  }`}
+                  style={{ fontFamily: "Inter, sans-serif" }}
+                >
+                  {t === "All" ? "All types" : POST_TYPE_LABELS[t]}
+                </button>
+              ))}
             </div>
           </FadeUp>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">

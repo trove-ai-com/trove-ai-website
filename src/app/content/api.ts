@@ -112,6 +112,7 @@ function localPostsAsBlogPosts(): BlogPost[] {
     date_label: a.date,
     read_time: a.readTime,
     tags: a.tags,
+    post_type: "insight",
     published: a.published,
   }));
 }
@@ -292,6 +293,31 @@ export async function uploadContentImage(file: File, folder = "uploads"): Promis
   if (error) throw error;
   const { data } = sb.storage.from("content-images").getPublicUrl(path);
   return data.publicUrl;
+}
+
+const CONTENT_IMAGE_FOLDERS = ["blog", "blog-body", "guides", "guides-body"];
+
+export type ContentImage = { name: string; url: string; folder: string; createdAt?: string };
+
+export async function adminListContentImages(): Promise<ContentImage[]> {
+  const sb = getSupabase();
+  if (!sb) throw new Error("Supabase is not configured");
+  const results = await Promise.all(
+    CONTENT_IMAGE_FOLDERS.map(async (folder) => {
+      const { data, error } = await sb.storage.from("content-images").list(folder, {
+        limit: 100,
+        sortBy: { column: "created_at", order: "desc" },
+      });
+      if (error || !data) return [];
+      return data.map((file) => ({
+        name: file.name,
+        folder,
+        createdAt: file.created_at,
+        url: sb.storage.from("content-images").getPublicUrl(`${folder}/${file.name}`).data.publicUrl,
+      }));
+    })
+  );
+  return results.flat().sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
 }
 
 export { isSupabaseConfigured };

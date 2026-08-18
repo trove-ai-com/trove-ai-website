@@ -6,7 +6,7 @@ export const inputClass =
 export const labelClass =
   "block text-xs font-semibold text-white/50 uppercase tracking-widest mb-2";
 
-export type AdminSection = "blog" | "guides" | "copy" | "faqs";
+export type AdminSection = "blog" | "guides" | "copy" | "faqs" | "media";
 
 export function Field({ label, children }: { label: string; children: ReactNode }) {
   return (

@@ -14,6 +14,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { MarkdownEditor } from "./MarkdownEditor";
+import { TagInput } from "./TagInput";
 import { Field, StatusBanner, inputClass, labelClass } from "./adminUi";
 import {
   adminDeleteBlogPost,
@@ -24,6 +25,8 @@ import {
 import {
   PRODUCT_COLORS,
   PRODUCT_OPTIONS,
+  POST_TYPE_LABELS,
+  POST_TYPE_OPTIONS,
   slugify,
   type BlogPost,
 } from "@/app/content/types";
@@ -48,6 +51,7 @@ export function emptyBlogDraft(): Partial<BlogPost> {
     date_label: new Date().toLocaleString("en-US", { month: "short", year: "numeric" }),
     read_time: "5 min",
     tags: [],
+    post_type: "insight",
     published: false,
   };
 }
@@ -334,6 +338,13 @@ function BlogEditor({
   const [error, setError] = useState(false);
   const [busy, setBusy] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [tagSuggestions, setTagSuggestions] = useState<string[]>([]);
+
+  useEffect(() => {
+    adminListBlogPosts()
+      .then((posts) => setTagSuggestions(Array.from(new Set(posts.flatMap((p) => p.tags))).sort()))
+      .catch(() => {});
+  }, []);
 
   function patch(partial: Partial<BlogPost>) {
     onChange({ ...editing, ...partial });
@@ -369,6 +380,7 @@ function BlogEditor({
         date_label: editing.date_label || "",
         read_time: editing.read_time || "5 min",
         tags: editing.tags || [],
+        post_type: editing.post_type || "insight",
         published: nextPublished,
       });
       patch({ published: nextPublished });
@@ -412,7 +424,6 @@ function BlogEditor({
     </button>
   );
 
-  const tagsStr = (editing.tags || []).join(", ");
   const isPublished = Boolean(editing.published);
 
   return (
@@ -497,7 +508,7 @@ function BlogEditor({
                 <MarkdownEditor
                   value={editing.body || ""}
                   onChange={(body) => patch({ body })}
-                  minHeightClass="min-h-[280px]"
+                  onImageUpload={(file) => uploadContentImage(file, "blog-body")}
                 />
               </div>
             </div>
@@ -566,24 +577,39 @@ function BlogEditor({
                   />
                 )}
               </Field>
-              <Field label="Product">
-                <select
-                  className={`${inputClass} cursor-pointer`}
-                  value={editing.product || PRODUCT_OPTIONS[0]}
-                  onChange={(e) =>
-                    patch({
-                      product: e.target.value,
-                      product_color: PRODUCT_COLORS[e.target.value],
-                    })
-                  }
-                >
-                  {PRODUCT_OPTIONS.map((p) => (
-                    <option key={p} value={p} className="bg-[#0A1929]">
-                      {p}
-                    </option>
-                  ))}
-                </select>
-              </Field>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Field label="Product">
+                  <select
+                    className={`${inputClass} cursor-pointer`}
+                    value={editing.product || PRODUCT_OPTIONS[0]}
+                    onChange={(e) =>
+                      patch({
+                        product: e.target.value,
+                        product_color: PRODUCT_COLORS[e.target.value],
+                      })
+                    }
+                  >
+                    {PRODUCT_OPTIONS.map((p) => (
+                      <option key={p} value={p} className="bg-[#0A1929]">
+                        {p}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
+                <Field label="Content type">
+                  <select
+                    className={`${inputClass} cursor-pointer`}
+                    value={editing.post_type || "insight"}
+                    onChange={(e) => patch({ post_type: e.target.value as BlogPost["post_type"] })}
+                  >
+                    {POST_TYPE_OPTIONS.map((t) => (
+                      <option key={t} value={t} className="bg-[#0A1929]">
+                        {POST_TYPE_LABELS[t]}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
+              </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Field label="Date label">
                   <input
@@ -600,19 +626,11 @@ function BlogEditor({
                   />
                 </Field>
               </div>
-              <Field label="Tags (comma-separated)">
-                <input
-                  className={inputClass}
-                  value={tagsStr}
-                  onChange={(e) =>
-                    patch({
-                      tags: e.target.value
-                        .split(",")
-                        .map((t) => t.trim())
-                        .filter(Boolean),
-                    })
-                  }
-                  placeholder="AI, Government, Security..."
+              <Field label="Tags">
+                <TagInput
+                  value={editing.tags || []}
+                  onChange={(tags) => patch({ tags })}
+                  suggestions={tagSuggestions}
                 />
               </Field>
             </div>

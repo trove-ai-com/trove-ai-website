@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { Plus, Save, Trash2 } from "lucide-react";
 import { MarkdownEditor } from "./MarkdownEditor";
+import { TagInput } from "./TagInput";
 import { Field, StatusBanner, inputClass } from "./adminUi";
-import { adminDeleteGuide, adminListGuides, adminUpsertGuide } from "@/app/content/api";
+import { adminDeleteGuide, adminListGuides, adminUpsertGuide, uploadContentImage } from "@/app/content/api";
 import {
   GUIDE_ICON_OPTIONS,
   PRODUCT_COLORS,
@@ -148,19 +149,11 @@ export function GuidesAdmin() {
               <input className={inputClass} value={editing.read_time || ""} onChange={(e) => setEditing({ ...editing, read_time: e.target.value })} />
             </Field>
           </div>
-          <Field label="Tags (comma-separated)">
-            <input
-              className={inputClass}
-              value={(editing.tags || []).join(", ")}
-              onChange={(e) =>
-                setEditing({
-                  ...editing,
-                  tags: e.target.value
-                    .split(",")
-                    .map((t) => t.trim())
-                    .filter(Boolean),
-                })
-              }
+          <Field label="Tags">
+            <TagInput
+              value={editing.tags || []}
+              onChange={(tags) => setEditing({ ...editing, tags })}
+              suggestions={Array.from(new Set(guides.flatMap((g) => g.tags))).sort()}
             />
           </Field>
           <Field label="Excerpt">
@@ -174,7 +167,7 @@ export function GuidesAdmin() {
             <MarkdownEditor
               value={editing.body || ""}
               onChange={(body) => setEditing({ ...editing, body })}
-              minHeightClass="min-h-[180px]"
+              onImageUpload={(file) => uploadContentImage(file, "guides-body")}
             />
           </Field>
           <Field label="Sort order">

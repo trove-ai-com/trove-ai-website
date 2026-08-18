@@ -1,4 +1,5 @@
 import ReactMarkdown from "react-markdown";
+import remarkBreaks from "remark-breaks";
 
 /** Renders article body with markdown: headings, bold/italic, links, lists, images. */
 export function ArticleBody({ body }: { body: string }) {
@@ -8,6 +9,7 @@ export function ArticleBody({ body }: { body: string }) {
       style={{ fontFamily: "Inter, sans-serif" }}
     >
       <ReactMarkdown
+        remarkPlugins={[remarkBreaks]}
         components={{
           h2: ({ children }) => (
             <h2 className="text-2xl font-bold text-white pt-4" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>

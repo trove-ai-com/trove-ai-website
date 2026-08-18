@@ -1,3 +1,5 @@
+export type PostType = "insight" | "guide" | "faq";
+
 export type BlogPost = {
   id: string;
   slug: string;
@@ -10,6 +12,7 @@ export type BlogPost = {
   date_label: string;
   read_time: string;
   tags: string[];
+  post_type: PostType;
   published: boolean;
   created_at?: string;
   updated_at?: string;
@@ -70,6 +73,14 @@ export const PRODUCT_COLORS: Record<string, string> = {
 export const PRODUCT_OPTIONS = Object.keys(PRODUCT_COLORS);
 
 export const GUIDE_ICON_OPTIONS = ["Camera", "Radio", "Shield", "Lock", "Brain", "Layers"] as const;
+
+export const POST_TYPE_LABELS: Record<PostType, string> = {
+  insight: "Insight",
+  guide: "Guide",
+  faq: "FAQ",
+};
+
+export const POST_TYPE_OPTIONS = Object.keys(POST_TYPE_LABELS) as PostType[];
 
 export function slugify(title: string): string {
   return (
