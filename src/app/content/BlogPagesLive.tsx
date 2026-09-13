@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { ArrowRight, ChevronRight } from "lucide-react";
 import { fetchBlogPostBySlug, fetchPublishedBlogPosts } from "@/app/content/api";
-import { POST_TYPE_LABELS, POST_TYPE_OPTIONS, type BlogPost, type PostType } from "@/app/content/types";
+import { blogCardPreview, POST_TYPE_LABELS, POST_TYPE_OPTIONS, type BlogPost, type PostType } from "@/app/content/types";
 import { ArticleBody } from "@/app/blog/ArticleBody";
 
 type Nav = (page: string) => void;
@@ -15,6 +15,7 @@ type SharedProps = {
 export function BlogPageLive({ onNavigate, FadeUp, SharedFooter }: SharedProps) {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [activeProduct, setActiveProduct] = useState("All");
+  const [activeTag, setActiveTag] = useState("All");
   const [activeType, setActiveType] = useState<"All" | PostType>("All");
   const [loading, setLoading] = useState(true);
 
@@ -25,16 +26,19 @@ export function BlogPageLive({ onNavigate, FadeUp, SharedFooter }: SharedProps) 
     });
   }, []);
 
-  const productFilters = ["All", ...Array.from(new Set(posts.map((a) => a.product)))];
+  const productFilters = ["All", ...Array.from(new Set(posts.map((a) => a.product).filter(Boolean)))];
+  const tagFilters = ["All", ...Array.from(new Set(posts.flatMap((a) => a.tags || []))).sort((a, b) => a.localeCompare(b))];
   const filtered = posts
     .filter((a) => activeProduct === "All" || a.product === activeProduct)
+    .filter((a) => activeTag === "All" || (a.tags || []).includes(activeTag))
     .filter((a) => activeType === "All" || (a.post_type || "insight") === activeType);
   const featured = posts[0];
+  const filtersActive = activeProduct !== "All" || activeTag !== "All" || activeType !== "All";
 
   if (loading) {
     return (
       <div className="min-h-screen pt-24 bg-[#040D1A] flex items-center justify-center">
-        <p className="text-white/40 text-sm">Loading insights…</p>
+        <p className="text-white/40 text-sm">Loading blog…</p>
       </div>
     );
   }
@@ -56,15 +60,15 @@ export function BlogPageLive({ onNavigate, FadeUp, SharedFooter }: SharedProps) 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-end">
                 <div>
                   <p className="text-[10px] font-bold tracking-[0.28em] uppercase text-[#10B981] mb-5" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                    Insights
+                    Blog
                   </p>
                   <h1 className="text-5xl md:text-[3.75rem] font-bold text-white leading-[1.04] tracking-tight" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                    Monthly articles on
+                    Articles on
                     <br />
                     <span className="text-[#10B981]">AI that matters.</span>
                   </h1>
                   <p className="mt-6 text-white/48 text-base leading-relaxed max-w-lg" style={{ fontFamily: "Inter, sans-serif" }}>
-                    Monthly articles on AI security, physical security, and cyber intelligence topics across Trove-AI&apos;s product lines.
+                    Weekly pieces on AI development, physical security, and cyber intelligence topics across Trove-AI&apos;s product lines.
                   </p>
                   <div className="mt-8 flex flex-wrap items-center gap-4">
                     <button
@@ -83,7 +87,7 @@ export function BlogPageLive({ onNavigate, FadeUp, SharedFooter }: SharedProps) 
                     {posts.length} articles published
                   </span>
                   <span className="text-[11px] text-white/38" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-                    1 new article / month
+                    Weekly pieces
                   </span>
                   <span className="text-[11px] text-white/38" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
                     6 product lines covered
@@ -129,10 +133,7 @@ export function BlogPageLive({ onNavigate, FadeUp, SharedFooter }: SharedProps) 
                     {featured.title}
                   </h2>
                   <p className="text-white/48 leading-relaxed mb-4" style={{ fontFamily: "Inter, sans-serif" }}>
-                    {featured.excerpt}
-                  </p>
-                  <p className="text-white/42 leading-relaxed text-sm border-t border-white/[0.05] pt-4 line-clamp-4" style={{ fontFamily: "Inter, sans-serif" }}>
-                    {featured.body.split(/\n\n+/)[0]}
+                    {blogCardPreview(featured, 280)}
                   </p>
                   <div className="mt-8 flex items-center gap-2 text-sm font-semibold text-[#10B981] group-hover:gap-3 transition-all" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                     Read article <ArrowRight className="w-4 h-4" />
@@ -151,7 +152,7 @@ export function BlogPageLive({ onNavigate, FadeUp, SharedFooter }: SharedProps) 
       <section id="recent-articles" className="py-16 scroll-mt-20">
         <div className="max-w-7xl mx-auto px-6">
           <FadeUp>
-            <div className="flex items-center justify-between mb-8 flex-wrap gap-4">
+            <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
               <div className="flex items-center gap-3">
                 <span className="text-[10px] font-bold tracking-[0.24em] uppercase text-white/42" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                   All articles
@@ -161,34 +162,42 @@ export function BlogPageLive({ onNavigate, FadeUp, SharedFooter }: SharedProps) 
                   {filtered.length} results
                 </span>
               </div>
-              <div className="flex items-center gap-1.5 flex-wrap">
-                {productFilters.map((p) => (
-                  <button
-                    key={p}
-                    onClick={() => setActiveProduct(p)}
-                    className={`text-[11px] px-3 py-1.5 rounded-full border transition-colors ${
-                      activeProduct === p ? "bg-white/10 border-white/20 text-white" : "border-white/[0.08] text-white/40 hover:text-white/60"
-                    }`}
-                    style={{ fontFamily: "Inter, sans-serif" }}
-                  >
-                    {p}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="flex items-center gap-1.5 flex-wrap mb-8">
-              {(["All", ...POST_TYPE_OPTIONS] as const).map((t) => (
+              {filtersActive ? (
                 <button
-                  key={t}
-                  onClick={() => setActiveType(t)}
-                  className={`text-[11px] px-3 py-1.5 rounded-full border transition-colors ${
-                    activeType === t ? "bg-[#10B981]/15 border-[#10B981]/40 text-[#10B981]" : "border-white/[0.08] text-white/40 hover:text-white/60"
-                  }`}
+                  onClick={() => {
+                    setActiveProduct("All");
+                    setActiveTag("All");
+                    setActiveType("All");
+                  }}
+                  className="text-[11px] text-white/40 hover:text-white/70 underline underline-offset-2"
                   style={{ fontFamily: "Inter, sans-serif" }}
                 >
-                  {t === "All" ? "All types" : POST_TYPE_LABELS[t]}
+                  Clear filters
                 </button>
-              ))}
+              ) : null}
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8">
+              <BlogFilter
+                label="Product"
+                value={activeProduct}
+                onChange={setActiveProduct}
+                options={productFilters.map((p) => ({ value: p, label: p === "All" ? "All products" : p }))}
+              />
+              <BlogFilter
+                label="Tag"
+                value={activeTag}
+                onChange={setActiveTag}
+                options={tagFilters.map((t) => ({ value: t, label: t === "All" ? "All tags" : t }))}
+              />
+              <BlogFilter
+                label="Post type"
+                value={activeType}
+                onChange={(v) => setActiveType(v as "All" | PostType)}
+                options={[
+                  { value: "All", label: "All types" },
+                  ...POST_TYPE_OPTIONS.map((t) => ({ value: t, label: POST_TYPE_LABELS[t] })),
+                ]}
+              />
             </div>
           </FadeUp>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -221,7 +230,7 @@ export function BlogPageLive({ onNavigate, FadeUp, SharedFooter }: SharedProps) 
                       {article.title}
                     </h3>
                     <p className="text-sm text-white/35 leading-relaxed mb-4 flex-1" style={{ fontFamily: "Inter, sans-serif" }}>
-                      {article.excerpt}
+                      {blogCardPreview(article)}
                     </p>
                     <div className="flex items-center justify-between mt-auto pt-3 border-t border-white/[0.05]">
                       <div className="flex gap-1.5 flex-wrap">
@@ -238,11 +247,51 @@ export function BlogPageLive({ onNavigate, FadeUp, SharedFooter }: SharedProps) 
               </FadeUp>
             ))}
           </div>
+          {filtered.length === 0 ? (
+            <p className="py-16 text-center text-sm text-white/35" style={{ fontFamily: "Inter, sans-serif" }}>
+              No articles match these filters.
+            </p>
+          ) : null}
         </div>
       </section>
 
       <SharedFooter onNavigate={onNavigate} />
     </div>
+  );
+}
+
+function BlogFilter({
+  label,
+  value,
+  onChange,
+  options,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  options: { value: string; label: string }[];
+}) {
+  return (
+    <label className="block">
+      <span
+        className="block text-[10px] font-bold tracking-[0.18em] uppercase text-white/35 mb-1.5"
+        style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+      >
+        {label}
+      </span>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full bg-[#071528] border border-white/[0.1] rounded-xl px-3 py-2.5 text-sm text-white/80 focus:outline-none focus:border-[#10B981]/50 cursor-pointer"
+        style={{ fontFamily: "Inter, sans-serif" }}
+      >
+        {options.map((opt) => (
+          <option key={opt.value} value={opt.value} className="bg-[#071528]">
+            {opt.label}
+          </option>
+        ))}
+      </select>
+    </label>
   );
 }
 
@@ -279,7 +328,7 @@ export function ArticlePageLive({ articleSlug, onNavigate, FadeUp, SharedFooter 
       <div className="min-h-screen pt-24 bg-[#040D1A] flex flex-col items-center justify-center gap-4">
         <p className="text-white/50">Article not found.</p>
         <button onClick={() => onNavigate("blog")} className="text-[#10B981] text-sm">
-          Back to Insights
+          Back to Blog
         </button>
       </div>
     );
@@ -297,7 +346,7 @@ export function ArticlePageLive({ articleSlug, onNavigate, FadeUp, SharedFooter 
                 className="inline-flex items-center gap-1.5 text-[11px] font-medium text-white/42 hover:text-white/55 transition-colors mb-7"
                 style={{ fontFamily: "'Space Grotesk', sans-serif" }}
               >
-                <ChevronRight className="w-3 h-3 rotate-180" /> Insights
+                <ChevronRight className="w-3 h-3 rotate-180" /> Blog
               </button>
               <div className="flex items-center gap-3 mb-5">
                 <span
@@ -318,7 +367,7 @@ export function ArticlePageLive({ articleSlug, onNavigate, FadeUp, SharedFooter 
                 {article.title}
               </h1>
               <p className="text-white/50 text-lg leading-relaxed" style={{ fontFamily: "Inter, sans-serif" }}>
-                {article.excerpt}
+                {blogCardPreview(article, 320)}
               </p>
             </FadeUp>
           </div>

@@ -126,7 +126,7 @@ ${body.trim()}
             className="inline-flex items-center gap-1.5 text-[11px] font-medium text-white/42 hover:text-white/55 transition-colors mb-7"
             style={{ fontFamily: "'Space Grotesk', sans-serif" }}
           >
-            <ChevronRight className="w-3 h-3 rotate-180" /> Insights
+            <ChevronRight className="w-3 h-3 rotate-180" /> Blog
           </button>
           <p
             className="text-[10px] font-bold tracking-[0.28em] uppercase text-[#10B981] mb-4"
@@ -342,7 +342,7 @@ ${body.trim()}
               onClick={() => onNavigate("blog")}
               className="mt-4 inline-flex items-center gap-2 text-[#10B981] hover:gap-3 transition-all text-sm font-medium"
             >
-              View Insights <ArrowRight className="w-4 h-4" />
+              View Blog <ArrowRight className="w-4 h-4" />
             </button>
           </div>
         </div>

@@ -317,17 +317,17 @@ export function ResourcesPageLive({ onNavigate, FadeUp, SharedFooter }: Props) {
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-[#10B981]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                      Insights
+                      Blog
                     </p>
                     <span className="text-[10px] text-white/38 border border-white/[0.08] rounded px-1.5 py-0.5" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
                       blog index
                     </span>
                   </div>
                   <h3 className="text-lg font-bold text-white group-hover:text-[#10B981] transition-colors" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                    Monthly articles on AI security, physical security, and cyber intelligence
+                    Articles on AI that matters.
                   </h3>
                   <p className="text-sm text-white/38 mt-1" style={{ fontFamily: "Inter, sans-serif" }}>
-                    One new article per month, rotating across all Trove-AI product lines and industries.
+                    Weekly pieces on AI development, physical security, and cyber intelligence topics across Trove-AI&apos;s product lines.
                   </p>
                 </div>
               </div>
