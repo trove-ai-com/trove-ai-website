@@ -281,43 +281,73 @@ export async function adminDeleteFaq(id: string): Promise<void> {
   if (error) throw error;
 }
 
-export async function uploadContentImage(file: File, folder = "uploads"): Promise<string> {
-  const sb = getSupabase();
-  if (!sb) throw new Error("Supabase is not configured");
-  const ext = file.name.split(".").pop() || "jpg";
-  const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-  const { error } = await sb.storage.from("content-images").upload(path, file, {
-    cacheControl: "3600",
-    upsert: false,
-  });
-  if (error) throw error;
-  const { data } = sb.storage.from("content-images").getPublicUrl(path);
-  return data.publicUrl;
-}
-
-const CONTENT_IMAGE_FOLDERS = ["blog", "blog-body", "guides", "guides-body"];
+const PHOTO_BUCKET = "content-images";
+const CONTENT_IMAGE_FOLDERS = ["library", "blog", "blog-body", "guides", "guides-body", "uploads"];
 
 export type ContentImage = { name: string; url: string; folder: string; createdAt?: string };
+
+function photoLibraryError(error: { message: string }): Error {
+  const msg = error.message || "";
+  if (/bucket|not found|does not exist/i.test(msg)) {
+    return new Error(
+      "Photo library is not set up. In Supabase → Storage, create a public bucket named content-images."
+    );
+  }
+  return new Error(msg || "Photo library request failed");
+}
+
+function isStoredFile(file: { id?: string | null; name: string }) {
+  return Boolean(file.id) && Boolean(file.name) && !file.name.startsWith(".");
+}
+
+export async function uploadContentImage(file: File, folder = "library"): Promise<string> {
+  const sb = getSupabase();
+  if (!sb) throw new Error("Supabase is not configured");
+  if (!file.type.startsWith("image/")) throw new Error("Please choose an image file.");
+  const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+  const path = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+  const { error } = await sb.storage.from(PHOTO_BUCKET).upload(path, file, {
+    cacheControl: "3600",
+    upsert: false,
+    contentType: file.type,
+  });
+  if (error) throw photoLibraryError(error);
+  const { data } = sb.storage.from(PHOTO_BUCKET).getPublicUrl(path);
+  return data.publicUrl;
+}
 
 export async function adminListContentImages(): Promise<ContentImage[]> {
   const sb = getSupabase();
   if (!sb) throw new Error("Supabase is not configured");
+  let setupError: Error | null = null;
   const results = await Promise.all(
     CONTENT_IMAGE_FOLDERS.map(async (folder) => {
-      const { data, error } = await sb.storage.from("content-images").list(folder, {
+      const { data, error } = await sb.storage.from(PHOTO_BUCKET).list(folder, {
         limit: 100,
         sortBy: { column: "created_at", order: "desc" },
       });
-      if (error || !data) return [];
-      return data.map((file) => ({
+      if (error) {
+        setupError = photoLibraryError(error);
+        return [];
+      }
+      return (data ?? []).filter(isStoredFile).map((file) => ({
         name: file.name,
         folder,
         createdAt: file.created_at,
-        url: sb.storage.from("content-images").getPublicUrl(`${folder}/${file.name}`).data.publicUrl,
+        url: sb.storage.from(PHOTO_BUCKET).getPublicUrl(`${folder}/${file.name}`).data.publicUrl,
       }));
     })
   );
-  return results.flat().sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
+  const images = results.flat().sort((a, b) => (b.createdAt || "").localeCompare(a.createdAt || ""));
+  if (images.length === 0 && setupError) throw setupError;
+  return images;
+}
+
+export async function adminDeleteContentImage(image: ContentImage): Promise<void> {
+  const sb = getSupabase();
+  if (!sb) throw new Error("Supabase is not configured");
+  const { error } = await sb.storage.from(PHOTO_BUCKET).remove([`${image.folder}/${image.name}`]);
+  if (error) throw photoLibraryError(error);
 }
 
 export { isSupabaseConfigured };

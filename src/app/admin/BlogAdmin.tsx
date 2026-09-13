@@ -6,7 +6,6 @@ import {
   Eye,
   EyeOff,
   FileText,
-  ImagePlus,
   Plus,
   Save,
   Search,
@@ -14,6 +13,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { MarkdownEditor } from "./MarkdownEditor";
+import { FeaturedImageField } from "./MediaLibrary";
 import { TagInput } from "./TagInput";
 import { Field, StatusBanner, inputClass, labelClass } from "./adminUi";
 import {
@@ -397,21 +397,6 @@ function BlogEditor({
     setBusy(false);
   }
 
-  async function onCover(file: File | undefined) {
-    if (!file) return;
-    setBusy(true);
-    try {
-      const url = await uploadContentImage(file, "blog");
-      patch({ image_url: url });
-      setStatusMsg("Image uploaded.");
-      setError(false);
-    } catch (e) {
-      setError(true);
-      setStatusMsg(e instanceof Error ? e.message : "Upload failed");
-    }
-    setBusy(false);
-  }
-
   const tabBtn = (id: typeof activeTab, label: string) => (
     <button
       onClick={() => setActiveTab(id)}
@@ -488,6 +473,11 @@ function BlogEditor({
 
           {activeTab === "content" && (
             <div className="space-y-5">
+              <FeaturedImageField
+                url={editing.image_url || ""}
+                onChange={(image_url) => patch({ image_url })}
+                uploadFolder="blog"
+              />
               <div>
                 <label className={labelClass} style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                   Excerpt
@@ -556,27 +546,11 @@ function BlogEditor({
 
           {activeTab === "settings" && (
             <div className="space-y-5">
-              <Field label="Featured image">
-                <div className="flex flex-wrap items-center gap-3">
-                  <label className="inline-flex items-center gap-2 text-sm text-white/50 border border-white/[0.1] rounded-full px-4 py-2 cursor-pointer hover:border-white/25">
-                    <ImagePlus className="w-4 h-4" /> Upload
-                    <input type="file" accept="image/*" className="hidden" onChange={(e) => onCover(e.target.files?.[0])} />
-                  </label>
-                  <input
-                    className={`${inputClass} flex-1 min-w-[200px]`}
-                    placeholder="Or paste image URL"
-                    value={editing.image_url || ""}
-                    onChange={(e) => patch({ image_url: e.target.value })}
-                  />
-                </div>
-                {editing.image_url && (
-                  <img
-                    src={editing.image_url}
-                    alt="Preview"
-                    className="mt-3 w-full h-40 object-cover rounded-lg border border-white/[0.08]"
-                  />
-                )}
-              </Field>
+              <FeaturedImageField
+                url={editing.image_url || ""}
+                onChange={(image_url) => patch({ image_url })}
+                uploadFolder="blog"
+              />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Field label="Product">
                   <select

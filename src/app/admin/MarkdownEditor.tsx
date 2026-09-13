@@ -11,6 +11,7 @@ import {
   ListOrdered,
   Quote,
   CornerDownLeft,
+  FolderOpen,
   ImagePlus,
   Loader2,
   Maximize2,
@@ -19,6 +20,7 @@ import {
   EyeOff,
 } from "lucide-react";
 import { ArticleBody } from "@/app/blog/ArticleBody";
+import { MediaPicker } from "./MediaLibrary";
 
 type Props = {
   value: string;
@@ -43,6 +45,7 @@ export function MarkdownEditor({
   const [preview, setPreview] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [libraryOpen, setLibraryOpen] = useState(false);
 
   useEffect(() => {
     if (!expanded) return;
@@ -280,15 +283,43 @@ export function MarkdownEditor({
     },
     {
       label: "Image",
-      title: onImageUpload ? "Upload image" : "Image markdown",
+      title: onImageUpload ? "Upload a photo from your computer" : "Image markdown",
       Icon: uploading ? Loader2 : ImagePlus,
       action: handleImageClick,
     },
+    ...(onImageUpload
+      ? [
+          {
+            label: "Library",
+            title: "Choose a photo from the library",
+            Icon: FolderOpen,
+            action: () => {
+              const el = ref.current;
+              if (el) savedSelection.current = { start: el.selectionStart, end: el.selectionEnd };
+              setLibraryOpen(true);
+            },
+          },
+        ]
+      : []),
   ];
 
-  function handleImageClick() {
+  function rememberCursor() {
     const el = ref.current;
     if (el) savedSelection.current = { start: el.selectionStart, end: el.selectionEnd };
+  }
+
+  function insertImageMarkdown(url: string) {
+    const { start, end } = savedSelection.current;
+    const selected = value.slice(start, end) || "image";
+    const before = value.slice(0, start);
+    const after = value.slice(end);
+    const needsLeading = before.length > 0 && !before.endsWith("\n\n");
+    const lead = needsLeading ? (before.endsWith("\n") ? "\n" : "\n\n") : "";
+    onChange(`${before}${lead}![${selected}](${url})${after}`);
+  }
+
+  function handleImageClick() {
+    rememberCursor();
     if (onImageUpload) {
       fileInputRef.current?.click();
       return;
@@ -300,14 +331,7 @@ export function MarkdownEditor({
     if (!file || !onImageUpload) return;
     setUploading(true);
     try {
-      const url = await onImageUpload(file);
-      const { start, end } = savedSelection.current;
-      const selected = value.slice(start, end) || "image";
-      const before = value.slice(0, start);
-      const after = value.slice(end);
-      const needsLeading = before.length > 0 && !before.endsWith("\n\n");
-      const lead = needsLeading ? (before.endsWith("\n") ? "\n" : "\n\n") : "";
-      onChange(`${before}${lead}![${selected}](${url})${after}`);
+      insertImageMarkdown(await onImageUpload(file));
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -417,9 +441,17 @@ export function MarkdownEditor({
       )}
 
       <p className="mt-2 text-[11px] text-white/30" style={{ fontFamily: "Inter, sans-serif" }}>
-        Headings: H1–H4. Select several lines, then Numbered, to make 1 / 2 / 3. Enter adds a visible
-        line break; Enter again starts a new paragraph. Enter in a list continues 2, 3, 4…
+        Headings: H1–H4. Image uploads a photo; Library reuses one already stored. Enter adds a
+        line break; Enter in a list continues 2, 3, 4…
       </p>
+      {onImageUpload ? (
+        <MediaPicker
+          open={libraryOpen}
+          onClose={() => setLibraryOpen(false)}
+          onSelect={insertImageMarkdown}
+          uploadFolder="library"
+        />
+      ) : null}
     </div>
   );
 }
