@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef, type ReactNode } from "react";
+import { useLocation, useNavigate } from "react-router";
+import { pageToPath, pathToPage } from "@/app/pageRoutes";
 import { motion, useInView } from "motion/react";
 import troveLogo from "@/imports/Trove.png";
 import partnersHero from "@/imports/pexels-kampus-8463142.jpg";
@@ -256,13 +258,33 @@ function SharedFooter({ onNavigate }: { onNavigate: (p: Page | string) => void }
               <TroveLogo className="h-7 w-auto object-contain" />
             </button>
             <p className="text-white/42 text-sm leading-relaxed max-w-xs">
-              Human-centered AI for safety, security, and critical decisions. Built for the environments where failure is not an option.
+              Human-centric AI for safety, security, and critical decisions. Built to protect people in the environments that need it most.
             </p>
           </div>
           {[
-            { title: "Products", links: ["VisualIQ", "DeepSenseIQ", "CareIQ", "CyberIQ", "VellumGuard", "LEXSO"] },
-            { title: "Company", links: ["About", "Careers", "Partners", "Press", "Contact"] },
-            { title: "Resources", links: ["Documentation", "Blog", "Whitepapers", "Case Studies", "Security"] },
+            {
+              title: "Products",
+              links: [
+                { label: "VisualIQ", page: "visualiq" },
+                { label: "DeepSenseIQ", page: "deepsenseiq" },
+                { label: "CareIQ", page: "careiq" },
+                { label: "CyberIQ", page: "cyberiq" },
+                { label: "VellumGuard", page: "vellumguard" },
+                { label: "LEXSO", page: "lexso" },
+              ],
+            },
+            {
+              title: "Company",
+              links: [
+                { label: "About", page: "about" },
+                { label: "Partners", page: "partners" },
+                { label: "Contact", page: "contact" },
+              ],
+            },
+            {
+              title: "Resources",
+              links: [{ label: "Blog", page: "blog" }],
+            },
           ].map((col) => (
             <div key={col.title}>
               <h4 className="text-white/40 text-[10px] font-semibold tracking-[0.2em] uppercase mb-4" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
@@ -270,17 +292,12 @@ function SharedFooter({ onNavigate }: { onNavigate: (p: Page | string) => void }
               </h4>
               <ul className="space-y-2.5">
                 {col.links.map((link) => (
-                  <li key={link}>
+                  <li key={link.page}>
                     <button
-                      onClick={() => {
-                        if (link === "About") onNavigate("about");
-                        else if (link === "Partners") onNavigate("partners");
-                        else if (link === "Contact") onNavigate("contact");
-                        else if (link === "Blog") onNavigate("blog");
-                      }}
+                      onClick={() => onNavigate(link.page)}
                       className="text-white/42 hover:text-white/70 text-sm transition-colors text-left"
                     >
-                      {link}
+                      {link.label}
                     </button>
                   </li>
                 ))}
@@ -4180,11 +4197,17 @@ function VellumGuardPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
 // ─── APP ────────────────────────────────────────────────────────────────────
 
 export default function App() {
-  const [currentPage, setCurrentPage] = useState<Page>("home");
+  const location = useLocation();
+  const navigateUrl = useNavigate();
+  const currentPage = pathToPage(location.pathname) as Page | "not-found";
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [location.pathname]);
 
   const navigate = (page: Page | string) => {
-    setCurrentPage(page as Page);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    const next = pageToPath(page);
+    if (next !== location.pathname) navigateUrl(next);
   };
 
   const articleSlug =
@@ -4197,7 +4220,7 @@ export default function App() {
     <div className="min-h-screen overflow-x-hidden" style={{ fontFamily: "Inter, sans-serif", background: "#040D1A" }}>
       <a href="#main-content" className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[200] focus:bg-[#1B6FE8] focus:text-white focus:px-4 focus:py-2 focus:rounded-lg focus:text-sm focus:font-semibold">Skip to main content</a>
       {currentPage !== "admin" && currentPage !== "blog-composer" && (
-        <Nav currentPage={currentPage} onNavigate={navigate} />
+        <Nav currentPage={currentPage === "not-found" ? "home" : currentPage} onNavigate={navigate} />
       )}
       <main id="main-content">
         {currentPage === "home" && <HomePage onNavigate={navigate} />}
@@ -4226,6 +4249,20 @@ export default function App() {
         {currentPage === "cyberiq" && <CyberIQPage onNavigate={navigate} />}
         {currentPage === "vellumguard" && <VellumGuardPage onNavigate={navigate} />}
         {currentPage === "lexso" && <ProductStubPage productId="lexso" onNavigate={navigate} />}
+        {currentPage === "not-found" && (
+          <div className="min-h-screen pt-32 px-6 bg-[#040D1A] text-center">
+            <p className="text-white/50 text-sm mb-4" style={{ fontFamily: "Inter, sans-serif" }}>
+              This page does not exist.
+            </p>
+            <button
+              onClick={() => navigate("home")}
+              className="text-[#10B981] text-sm font-semibold"
+              style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+            >
+              Back to home
+            </button>
+          </div>
+        )}
       </main>
     </div>
     </AuthProvider>
