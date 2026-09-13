@@ -1,4 +1,4 @@
-import { useRef, useState, type TextareaHTMLAttributes } from "react";
+import { useEffect, useRef, useState, type TextareaHTMLAttributes } from "react";
 import {
   Bold,
   Italic,
@@ -30,7 +30,7 @@ export function MarkdownEditor({
   value,
   onChange,
   placeholder,
-  minHeightClass = "min-h-[420px]",
+  minHeightClass = "h-[min(72vh,760px)]",
   onImageUpload,
 }: Props) {
   const ref = useRef<HTMLTextAreaElement>(null);
@@ -40,7 +40,21 @@ export function MarkdownEditor({
   const [expanded, setExpanded] = useState(false);
   const [uploading, setUploading] = useState(false);
 
-  const heightClass = expanded ? "min-h-[70vh]" : minHeightClass;
+  useEffect(() => {
+    if (!expanded) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setExpanded(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [expanded]);
+
+  const heightClass = expanded ? "flex-1 min-h-0" : minHeightClass;
 
   function applyWrap({ prefix, suffix = prefix, placeholder = "text", block = false }: WrapOpts) {
     const el = ref.current;
@@ -196,12 +210,25 @@ export function MarkdownEditor({
     placeholder:
       placeholder ||
       "Write with markdown. Use the toolbar for bold, italic, headings, links, and lists.\n\nSeparate paragraphs with a blank line.",
-    className: `w-full rounded-b-xl bg-[#071528] border border-t-0 border-white/[0.08] px-4 py-3 text-sm text-white/85 placeholder:text-white/25 focus:outline-none focus:border-[#1B6FE8]/50 resize-y font-mono ${heightClass}`,
+    className: `w-full rounded-b-xl bg-[#071528] border border-t-0 border-white/[0.08] px-5 py-4 text-[15px] leading-7 text-white/85 placeholder:text-white/25 focus:outline-none focus:border-[#1B6FE8]/50 font-mono ${
+      expanded ? "resize-none overflow-y-auto" : "resize-y"
+    } ${heightClass}`,
     style: { fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace" },
   };
 
   return (
-    <div>
+    <div
+      className={
+        expanded
+          ? "fixed inset-0 z-[80] flex flex-col bg-[#03080F] p-4 sm:p-6"
+          : "flex flex-col"
+      }
+    >
+      {expanded && (
+        <p className="mb-2 text-xs text-white/40" style={{ fontFamily: "Inter, sans-serif" }}>
+          Full-screen writing — press Esc or Exit to return
+        </p>
+      )}
       <div className="flex flex-wrap items-center gap-1 rounded-t-xl border border-white/[0.08] bg-[#040D1A] px-2 py-1.5">
         {tools.map(({ label, title, Icon, action }) => (
           <button
@@ -228,11 +255,14 @@ export function MarkdownEditor({
         <div className="flex-1" />
         <button
           type="button"
-          title={expanded ? "Collapse" : "Expand"}
+          title={expanded ? "Exit full screen (Esc)" : "Write in full screen"}
           onClick={() => setExpanded((p) => !p)}
-          className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] text-white/50 hover:text-white hover:bg-white/[0.06] transition-colors"
+          className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] transition-colors ${
+            expanded ? "text-[#1B6FE8] bg-[#1B6FE8]/10" : "text-white/50 hover:text-white hover:bg-white/[0.06]"
+          }`}
         >
           {expanded ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+          <span className="hidden sm:inline">{expanded ? "Exit" : "Full screen"}</span>
         </button>
         <button
           type="button"
@@ -248,7 +278,7 @@ export function MarkdownEditor({
       </div>
 
       {preview ? (
-        <div className={`rounded-b-xl border border-t-0 border-white/[0.08] bg-[#071528] px-5 py-4 overflow-y-auto ${heightClass}`}>
+        <div className={`rounded-b-xl border border-t-0 border-white/[0.08] bg-[#071528] px-6 py-5 overflow-y-auto ${heightClass}`}>
           {value.trim() ? (
             <ArticleBody body={value} />
           ) : (

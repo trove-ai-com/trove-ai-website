@@ -427,7 +427,7 @@ function BlogEditor({
   const isPublished = Boolean(editing.published);
 
   return (
-    <div className="max-w-4xl mx-auto px-6 py-8">
+    <div className="max-w-6xl mx-auto px-6 py-8">
       <div className="flex items-center justify-between mb-8 flex-wrap gap-3">
         <div className="flex items-center gap-3">
           <button
@@ -470,8 +470,8 @@ function BlogEditor({
 
       <StatusBanner message={statusMsg} error={error} />
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-6">
-        <div className="space-y-6">
+      <div className={`grid grid-cols-1 gap-6 ${activeTab === "content" ? "" : "lg:grid-cols-[1fr_280px]"}`}>
+        <div className="space-y-6 min-w-0">
           <input
             value={editing.title || ""}
             onChange={(e) => handleTitleChange(e.target.value)}
@@ -637,7 +637,7 @@ function BlogEditor({
           )}
         </div>
 
-        <div className="space-y-4">
+        <div className={`space-y-4 ${activeTab === "content" ? "hidden" : ""}`}>
           <div className="bg-[#071528] border border-white/[0.07] rounded-xl p-5">
             <p
               className="text-xs font-semibold text-white/40 uppercase tracking-widest mb-4"
