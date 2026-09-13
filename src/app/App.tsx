@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, type ReactNode } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { pageToPath, pathToPage } from "@/app/pageRoutes";
+import { usePageMeta } from "@/app/usePageMeta";
 import { motion, useInView } from "motion/react";
 import troveLogo from "@/imports/Trove.png";
 import partnersHero from "@/imports/pexels-kampus-8463142.jpg";
@@ -4216,6 +4217,7 @@ export default function App() {
   const location = useLocation();
   const navigateUrl = useNavigate();
   const currentPage = pathToPage(location.pathname) as Page | "not-found";
+  usePageMeta(location.pathname);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });

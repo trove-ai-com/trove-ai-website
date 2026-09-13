@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ComponentType } from "react";
 import { ArrowRight, BookOpen, Camera, Radio, Shield, Lock, Brain, Layers } from "lucide-react";
-import { fetchPageCopy, fetchPublishedFaqs, fetchPublishedGuides } from "@/app/content/api";
-import { guideSlug, type ResourceFaq, type ResourceGuide, type ResourcesPageCopy } from "@/app/content/types";
+import { fetchPageCopy, fetchPublishedBlogPosts, fetchPublishedFaqs, fetchPublishedGuides } from "@/app/content/api";
+import { guideSlug, toPlainPreview, type ResourceFaq, type ResourceGuide, type ResourcesPageCopy } from "@/app/content/types";
 
 const iconMap: Record<string, typeof Camera> = {
   Camera,
@@ -14,12 +14,13 @@ const iconMap: Record<string, typeof Camera> = {
 
 type Props = {
   onNavigate: (page: string) => void;
-  FadeUp: React.ComponentType<{ children: React.ReactNode; delay?: number; className?: string }>;
-  SharedFooter: React.ComponentType<{ onNavigate: (page: string) => void }>;
+  FadeUp: ComponentType<{ children: React.ReactNode; delay?: number; className?: string }>;
+  SharedFooter: ComponentType<{ onNavigate: (page: string) => void }>;
 };
 
 export function ResourcesPageLive({ onNavigate, FadeUp, SharedFooter }: Props) {
   const [guides, setGuides] = useState<ResourceGuide[]>([]);
+  const [insightCount, setInsightCount] = useState(0);
   const [copy, setCopy] = useState<ResourcesPageCopy | null>(null);
   const [faqs, setFaqs] = useState<ResourceFaq[]>([]);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
@@ -28,13 +29,15 @@ export function ResourcesPageLive({ onNavigate, FadeUp, SharedFooter }: Props) {
   useEffect(() => {
     let cancelled = false;
     (async () => {
-      const [g, c, f] = await Promise.all([
+      const [g, posts, c, f] = await Promise.all([
         fetchPublishedGuides(),
+        fetchPublishedBlogPosts(),
         fetchPageCopy(),
         fetchPublishedFaqs(),
       ]);
       if (!cancelled) {
         setGuides(g);
+        setInsightCount(posts.length);
         setCopy(c);
         setFaqs(f);
         setLoading(false);
@@ -77,17 +80,14 @@ export function ResourcesPageLive({ onNavigate, FadeUp, SharedFooter }: Props) {
               <p className="mt-6 text-white/50 text-lg leading-relaxed max-w-2xl" style={{ fontFamily: "Inter, sans-serif" }}>
                 {copy.hero_subtitle}
               </p>
-              <p className="mt-3 text-white/42 text-sm leading-relaxed max-w-xl" style={{ fontFamily: "Inter, sans-serif" }}>
-                {copy.hero_note}
-              </p>
             </FadeUp>
 
             <FadeUp delay={0.1}>
               <div className="divide-y divide-white/[0.05]">
                 {[
-                  { n: String(guides.length), label: "Comparison guides", note: "Available now" },
-                  { n: "1×", label: "New piece per month", note: "No subscription" },
-                  { n: "Free", label: "No gate, no form", note: "Direct access" },
+                  { n: String(guides.length), label: "Guides" },
+                  { n: String(insightCount), label: "Insights" },
+                  { n: "1×", label: "New piece per week" },
                 ].map((s) => (
                   <div key={s.label} className="flex items-baseline justify-between py-3.5">
                     <div className="flex items-baseline gap-3">
@@ -98,9 +98,6 @@ export function ResourcesPageLive({ onNavigate, FadeUp, SharedFooter }: Props) {
                         {s.label}
                       </span>
                     </div>
-                    <span className="text-[10px] text-white/40 tracking-wider flex-shrink-0" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-                      {s.note}
-                    </span>
                   </div>
                 ))}
               </div>
@@ -145,7 +142,7 @@ export function ResourcesPageLive({ onNavigate, FadeUp, SharedFooter }: Props) {
                     {featured.title}
                   </h2>
                   <p className="text-white/48 leading-relaxed text-base mb-4" style={{ fontFamily: "Inter, sans-serif" }}>
-                    {featured.excerpt}
+                    {toPlainPreview(featured.excerpt || featured.body, 280)}
                   </p>
                   <div className="mt-8 flex items-center gap-2 text-sm font-semibold text-[#10B981] group-hover:gap-3 transition-all" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                     Read guide <ArrowRight className="w-4 h-4" />
@@ -182,6 +179,31 @@ export function ResourcesPageLive({ onNavigate, FadeUp, SharedFooter }: Props) {
           </div>
         </section>
       )}
+
+      <section className="py-12 border-b border-white/[0.06]">
+        <div className="max-w-7xl mx-auto px-6 space-y-5">
+          <FadeUp>
+            <CatalogLink
+              label="Guides"
+              title="Comparison guides and technical explainers."
+              body="Browse the full catalog of comparison guides, explainers, and compliance maps."
+              cta="Browse all guides"
+              Icon={BookOpen}
+              onClick={() => onNavigate("guides")}
+            />
+          </FadeUp>
+          <FadeUp>
+            <CatalogLink
+              label="Insights"
+              title="Weekly articles on AI development, physical security, and cyber intelligence."
+              body="One new article per week, rotating across all Trove-AI product lines and industries."
+              cta="Browse recent articles"
+              Icon={Layers}
+              onClick={() => onNavigate("blog")}
+            />
+          </FadeUp>
+        </div>
+      </section>
 
       {faqs.length > 0 && (
         <section className="py-16 border-b border-white/[0.06]">
@@ -222,73 +244,6 @@ export function ResourcesPageLive({ onNavigate, FadeUp, SharedFooter }: Props) {
         </section>
       )}
 
-      <section className="py-12 border-b border-white/[0.06]">
-        <div className="max-w-7xl mx-auto px-6 space-y-5">
-          <FadeUp>
-            <div
-              className="group flex items-center justify-between gap-6 p-8 rounded-2xl border border-white/[0.07] hover:border-[#10B981]/30 hover:bg-[#10B981]/[0.03] transition-all duration-300 cursor-pointer"
-              onClick={() => onNavigate("guides")}
-            >
-              <div className="flex items-center gap-5">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.2)" }}>
-                  <BookOpen className="w-5 h-5 text-[#10B981]" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-[#10B981]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                      Guides
-                    </p>
-                    <span className="text-[10px] text-white/38 border border-white/[0.08] rounded px-1.5 py-0.5" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-                      {guides.length} published
-                    </span>
-                  </div>
-                  <h3 className="text-lg font-bold text-white group-hover:text-[#10B981] transition-colors" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                    Comparison guides and technical explainers.
-                  </h3>
-                  <p className="text-sm text-white/38 mt-1" style={{ fontFamily: "Inter, sans-serif" }}>
-                    Browse the full catalog of comparison guides, explainers, and compliance maps.
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 text-sm font-semibold text-[#10B981] group-hover:gap-3 transition-all flex-shrink-0" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                Browse all guides <ArrowRight className="w-4 h-4" />
-              </div>
-            </div>
-          </FadeUp>
-          <FadeUp>
-            <div
-              className="group flex items-center justify-between gap-6 p-8 rounded-2xl border border-white/[0.07] hover:border-[#10B981]/30 hover:bg-[#10B981]/[0.03] transition-all duration-300 cursor-pointer"
-              onClick={() => onNavigate("blog")}
-            >
-              <div className="flex items-center gap-5">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.2)" }}>
-                  <Layers className="w-5 h-5 text-[#10B981]" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-[#10B981]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                      Blog
-                    </p>
-                    <span className="text-[10px] text-white/38 border border-white/[0.08] rounded px-1.5 py-0.5" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
-                      blog index
-                    </span>
-                  </div>
-                  <h3 className="text-lg font-bold text-white group-hover:text-[#10B981] transition-colors" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                    Articles on AI that matters.
-                  </h3>
-                  <p className="text-sm text-white/38 mt-1" style={{ fontFamily: "Inter, sans-serif" }}>
-                    Weekly pieces on AI development, physical security, and cyber intelligence topics across Trove-AI&apos;s product lines.
-                  </p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 text-sm font-semibold text-[#10B981] group-hover:gap-3 transition-all flex-shrink-0" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                Browse recent articles <ArrowRight className="w-4 h-4" />
-              </div>
-            </div>
-          </FadeUp>
-        </div>
-      </section>
-
       <section className="py-16 border-b border-white/[0.06]">
         <div className="max-w-7xl mx-auto px-6">
           <FadeUp>
@@ -305,7 +260,7 @@ export function ResourcesPageLive({ onNavigate, FadeUp, SharedFooter }: Props) {
                 {[
                   { label: "Audience", value: "Security engineers\nGov IT procurement\nCompliance leads" },
                   { label: "Format", value: "Comparison guides\nTechnical explainers\nCompliance maps" },
-                  { label: "Cadence", value: "1 new piece/month\nNo newsletter\nNo paywall" },
+                  { label: "Cadence", value: "1 new piece/week\nNo newsletter\nNo paywall" },
                   { label: "Coverage", value: "All 6 product lines\nAll major industries\nAll compliance frameworks" },
                 ].map((item) => (
                   <div key={item.label} className="bg-white/[0.03] rounded-xl p-4 border border-white/[0.05]">
@@ -355,6 +310,49 @@ export function ResourcesPageLive({ onNavigate, FadeUp, SharedFooter }: Props) {
       </section>
 
       <SharedFooter onNavigate={onNavigate} />
+    </div>
+  );
+}
+
+function CatalogLink({
+  label,
+  title,
+  body,
+  cta,
+  Icon,
+  onClick,
+}: {
+  label: string;
+  title: string;
+  body: string;
+  cta: string;
+  Icon: typeof BookOpen;
+  onClick: () => void;
+}) {
+  return (
+    <div
+      className="group flex items-center justify-between gap-6 p-8 rounded-2xl border border-white/[0.07] hover:border-[#10B981]/30 hover:bg-[#10B981]/[0.03] transition-all duration-300 cursor-pointer"
+      onClick={onClick}
+    >
+      <div className="flex items-center gap-5">
+        <div className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(16,185,129,0.12)", border: "1px solid rgba(16,185,129,0.2)" }}>
+          <Icon className="w-5 h-5 text-[#10B981]" />
+        </div>
+        <div>
+          <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-[#10B981] mb-1" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+            {label}
+          </p>
+          <h3 className="text-lg font-bold text-white group-hover:text-[#10B981] transition-colors" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+            {title}
+          </h3>
+          <p className="text-sm text-white/38 mt-1" style={{ fontFamily: "Inter, sans-serif" }}>
+            {body}
+          </p>
+        </div>
+      </div>
+      <div className="flex items-center gap-2 text-sm font-semibold text-[#10B981] group-hover:gap-3 transition-all flex-shrink-0" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+        {cta} <ArrowRight className="w-4 h-4" />
+      </div>
     </div>
   );
 }

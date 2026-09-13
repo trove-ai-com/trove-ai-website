@@ -56,14 +56,17 @@ const fallbackGuides: ResourceGuide[] = [
   },
 ];
 
+const NEW_HERO_TITLE = "Explore guides, expert insights, and FAQs.";
+const NEW_HERO_SUBTITLE =
+  "Comparative and educational content on sensor-agnostic architecture, contextual AI intelligence, and compliance for government, care, enterprise environments.";
+const NEW_CADENCE_FAQ = "Resources & Insights publishes one new piece per week.";
+
 const fallbackCopy: ResourcesPageCopy = {
   id: 1,
   hero_eyebrow: "Resources & Insights",
-  hero_title: "Explore guides, FAQs,\nand expert insights.",
-  hero_subtitle:
-    "Comparison guides and FAQ content on hardware-agnostic security, multi-sensor fusion, and AI surveillance compliance for government.",
-  hero_note:
-    "Resources publishes one new comparison or FAQ piece per month, building on the direct-answer content across Trove-AI's product and industry pages.",
+  hero_title: NEW_HERO_TITLE,
+  hero_subtitle: NEW_HERO_SUBTITLE,
+  hero_note: "",
   about_label: "About this publication",
   about_body:
     "Whether you're comparing solutions, reviewing technical requirements, or learning about AI technologies, Resources & Insights provides straightforward answers to the questions teams ask most often.",
@@ -77,8 +80,7 @@ const fallbackFaqs: ResourceFaq[] = [
   {
     id: "faq-0",
     question: "How often is new content published?",
-    answer:
-      "Resources & Insights publishes one new comparison guide, explainer, or FAQ piece per month. Insights blog articles rotate across product lines on the same cadence.",
+    answer: NEW_CADENCE_FAQ,
     sort_order: 0,
     published: true,
   },
@@ -98,6 +100,12 @@ const fallbackFaqs: ResourceFaq[] = [
     published: true,
   },
 ];
+
+export { fallbackCopy, fallbackFaqs, fallbackGuides };
+
+export function getFallbackBlogPosts(): BlogPost[] {
+  return localPostsAsBlogPosts();
+}
 
 function localPostsAsBlogPosts(): BlogPost[] {
   return localInsights.map((a) => ({
@@ -165,12 +173,34 @@ export async function fetchPublishedGuideBySlug(slug: string): Promise<ResourceG
   return guides.find((g) => guideSlug(g) === slug || g.id === slug) ?? null;
 }
 
+function withUpdatedPageCopy(copy: ResourcesPageCopy): ResourcesPageCopy {
+  const legacyHero =
+    copy.hero_title.includes("Explore guides, FAQs") ||
+    (copy.hero_note || "").includes("one new comparison or FAQ piece per month") ||
+    (copy.hero_subtitle || "").includes("hardware-agnostic security");
+  if (!legacyHero) return copy;
+  return {
+    ...copy,
+    hero_title: NEW_HERO_TITLE,
+    hero_subtitle: NEW_HERO_SUBTITLE,
+    hero_note: "",
+  };
+}
+
+function withUpdatedFaqs(faqs: ResourceFaq[]): ResourceFaq[] {
+  return faqs.map((faq) =>
+    faq.question === "How often is new content published?" && /per month/i.test(faq.answer)
+      ? { ...faq, answer: NEW_CADENCE_FAQ }
+      : faq
+  );
+}
+
 export async function fetchPageCopy(): Promise<ResourcesPageCopy> {
   const sb = getSupabase();
   if (!sb) return fallbackCopy;
   const { data, error } = await sb.from("resources_page_copy").select("*").eq("id", 1).maybeSingle();
   if (error || !data) return fallbackCopy;
-  return data as ResourcesPageCopy;
+  return withUpdatedPageCopy(data as ResourcesPageCopy);
 }
 
 export async function fetchPublishedFaqs(): Promise<ResourceFaq[]> {
@@ -182,7 +212,7 @@ export async function fetchPublishedFaqs(): Promise<ResourceFaq[]> {
     .eq("published", true)
     .order("sort_order", { ascending: true });
   if (error || !data) return fallbackFaqs;
-  return data as ResourceFaq[];
+  return withUpdatedFaqs(data as ResourceFaq[]);
 }
 
 // ─── Admin CRUD ─────────────────────────────────────────────────────────────
