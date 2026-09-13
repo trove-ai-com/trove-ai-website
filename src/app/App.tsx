@@ -491,7 +491,7 @@ function Nav({ currentPage, onNavigate }: { currentPage: Page; onNavigate: (p: P
   }, []);
 
   const navLinks: { label: string; page?: Page; hasMega?: boolean; hasSub?: boolean }[] = [
-    { label: "Solutions", hasMega: true },
+    { label: "Solutions", page: "solutions", hasMega: true },
     { label: "Industries", page: "industries" },
     { label: "About", page: "about" },
     { label: "Resources", page: "resources", hasSub: true },
@@ -544,19 +544,16 @@ function Nav({ currentPage, onNavigate }: { currentPage: Page; onNavigate: (p: P
                 <div className="absolute top-full left-1/2 -translate-x-1/2 pt-1 z-50">
                   <div className="w-60 bg-[#071528] border border-white/[0.10] rounded-xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
                     {([
-                      { label: "Resources & Insights", page: "resources" as Page, desc: "Comparison guides & FAQ", active: currentPage === "resources" },
-                      { label: "Blog", page: "blog" as Page, desc: "Weekly articles", active: currentPage === "blog" },
-                    ] as { label: string; page: Page; desc: string; active: boolean }[]).map((item, i) => (
+                      { label: "Resources & Insights", page: "resources" as Page, active: currentPage === "resources" },
+                      { label: "Blog", page: "blog" as Page, active: currentPage === "blog" },
+                    ] as { label: string; page: Page; active: boolean }[]).map((item, i) => (
                       <button
                         key={item.page}
                         onClick={() => { onNavigate(item.page); setSubOpen(false); }}
-                        className={`w-full flex items-start gap-3 px-4 py-4 text-left transition-colors ${i < 1 ? "border-b border-white/[0.06]" : ""} ${item.active ? "bg-white/[0.06]" : "hover:bg-white/[0.05]"}`}
+                        className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors ${i < 1 ? "border-b border-white/[0.06]" : ""} ${item.active ? "bg-white/[0.06]" : "hover:bg-white/[0.05]"}`}
                       >
-                        <div className={`w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0 ${item.active ? "bg-[#10B981]" : "bg-white/20"}`} />
-                        <div>
-                          <span className={`block text-sm font-semibold ${item.active ? "text-[#10B981]" : "text-white/85"}`} style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{item.label}</span>
-                          <span className="block text-[11px] text-white/42 mt-0.5 leading-snug" style={{ fontFamily: "Inter, sans-serif" }}>{item.desc}</span>
-                        </div>
+                        <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${item.active ? "bg-[#10B981]" : "bg-white/20"}`} />
+                        <span className={`text-sm font-semibold ${item.active ? "text-[#10B981]" : "text-white/85"}`} style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{item.label}</span>
                       </button>
                     ))}
                   </div>
@@ -595,15 +592,10 @@ function Nav({ currentPage, onNavigate }: { currentPage: Page; onNavigate: (p: P
                         </button>
                       ))}
                     </div>
-                    <div className="mt-4 pt-3 border-t border-white/[0.06] flex items-center justify-between">
-                      <button
-                        onClick={() => { onNavigate("solutions"); setMegaOpen(false); }}
-                        className="flex items-center gap-2 text-xs font-medium text-[#10B981] hover:gap-3 transition-all"
-                        style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-                      >
-                        Full platform overview <ArrowRight className="w-3.5 h-3.5" />
-                      </button>
-                      <span className="text-[11px] text-white/42">All products powered by DeepSense</span>
+                    <div className="mt-4 pt-3 border-t border-white/[0.06]">
+                      <p className="text-[11px] text-white/42" style={{ fontFamily: "Inter, sans-serif" }}>
+                        All products powered by DeepSense AI Engine
+                      </p>
                     </div>
                   </div>
                 </div>
