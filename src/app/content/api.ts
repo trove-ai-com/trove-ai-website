@@ -1,6 +1,6 @@
 import { getSupabase, isSupabaseConfigured } from "@/lib/supabase";
 import type { BlogPost, ResourceFaq, ResourceGuide, ResourcesPageCopy } from "./types";
-import { PRODUCT_COLORS } from "./types";
+import { guideSlug, PRODUCT_COLORS } from "./types";
 import { allInsights as localInsights } from "@/app/blog/loadArticles";
 
 // ─── Fallback local data ────────────────────────────────────────────────────
@@ -158,6 +158,11 @@ export async function fetchPublishedGuides(): Promise<ResourceGuide[]> {
     .order("sort_order", { ascending: true });
   if (error || !data) return fallbackGuides;
   return data as ResourceGuide[];
+}
+
+export async function fetchPublishedGuideBySlug(slug: string): Promise<ResourceGuide | null> {
+  const guides = await fetchPublishedGuides();
+  return guides.find((g) => guideSlug(g) === slug || g.id === slug) ?? null;
 }
 
 export async function fetchPageCopy(): Promise<ResourcesPageCopy> {

@@ -16,11 +16,22 @@ import { AdminPage } from "@/app/admin/AdminPage";
 import { AuthProvider } from "@/app/admin/AuthProvider";
 import { ResourcesPageLive } from "@/app/content/ResourcesPageLive";
 import { ArticlePageLive, BlogPageLive } from "@/app/content/BlogPagesLive";
+import { GuidePageLive, GuidesPageLive } from "@/app/content/GuidesPagesLive";
 import { blogCardPreview } from "@/app/content/types";
 import { ContactPage } from "@/app/contact/ContactPage";
 import { openContact } from "@/app/contact/openContact";
 
-type Page = "home" | "solutions" | "about" | "industries" | "resources" | "blog" | "blog-composer" | "admin" | "partners" | "contact" | "visualiq" | "deepsenseiq" | "careiq" | "cyberiq" | "vellumguard" | "lexso" | `article-${string}`;
+type Page = "home" | "solutions" | "about" | "industries" | "resources" | "guides" | "blog" | "blog-composer" | "admin" | "partners" | "contact" | "visualiq" | "deepsenseiq" | "careiq" | "cyberiq" | "vellumguard" | "lexso" | `article-${string}` | `guide-${string}`;
+
+function isResourcesNavPage(page: Page | string) {
+  return (
+    page === "resources" ||
+    page === "blog" ||
+    page === "guides" ||
+    page === "blog-composer" ||
+    (typeof page === "string" && (page.startsWith("article-") || page.startsWith("guide-")))
+  );
+}
 
 function TroveLogo({ className }: { className?: string }) {
   const [src, setSrc] = useState<string>("");
@@ -283,7 +294,10 @@ function SharedFooter({ onNavigate }: { onNavigate: (p: Page | string) => void }
             },
             {
               title: "Resources",
-              links: [{ label: "Blog", page: "blog" }],
+              links: [
+                { label: "Guides", page: "guides" },
+                { label: "Blog", page: "blog" },
+              ],
             },
           ].map((col) => (
             <div key={col.title}>
@@ -524,10 +538,10 @@ function Nav({ currentPage, onNavigate }: { currentPage: Page; onNavigate: (p: P
             >
               <button
                 onClick={() => { link.page && onNavigate(link.page); }}
-                aria-current={link.page && (currentPage === link.page || (link.hasSub && (currentPage === "blog" || currentPage === "blog-composer" || (typeof currentPage === "string" && currentPage.startsWith("article-"))))) ? "page" : undefined}
+                aria-current={link.page && (currentPage === link.page || (link.hasSub && isResourcesNavPage(currentPage))) ? "page" : undefined}
                 aria-expanded={link.hasMega ? megaOpen : link.hasSub ? subOpen : undefined}
                 className={`flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                  link.page && (currentPage === link.page || (link.hasSub && (currentPage === "blog" || currentPage === "blog-composer" || (typeof currentPage === "string" && currentPage.startsWith("article-")))))
+                  link.page && (currentPage === link.page || (link.hasSub && isResourcesNavPage(currentPage)))
                     ? "text-white bg-white/[0.08]"
                     : "text-white/55 hover:text-white hover:bg-white/[0.05]"
                 }`}
@@ -545,12 +559,13 @@ function Nav({ currentPage, onNavigate }: { currentPage: Page; onNavigate: (p: P
                   <div className="w-60 bg-[#071528] border border-white/[0.10] rounded-xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
                     {([
                       { label: "Resources & Insights", page: "resources" as Page, active: currentPage === "resources" },
-                      { label: "Blog", page: "blog" as Page, active: currentPage === "blog" },
-                    ] as { label: string; page: Page; active: boolean }[]).map((item, i) => (
+                      { label: "Guides", page: "guides" as Page, active: currentPage === "guides" || (typeof currentPage === "string" && currentPage.startsWith("guide-")) },
+                      { label: "Blog", page: "blog" as Page, active: currentPage === "blog" || (typeof currentPage === "string" && currentPage.startsWith("article-")) },
+                    ] as { label: string; page: Page; active: boolean }[]).map((item, i, items) => (
                       <button
                         key={item.page}
                         onClick={() => { onNavigate(item.page); setSubOpen(false); }}
-                        className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors ${i < 1 ? "border-b border-white/[0.06]" : ""} ${item.active ? "bg-white/[0.06]" : "hover:bg-white/[0.05]"}`}
+                        className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-colors ${i < items.length - 1 ? "border-b border-white/[0.06]" : ""} ${item.active ? "bg-white/[0.06]" : "hover:bg-white/[0.05]"}`}
                       >
                         <div className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${item.active ? "bg-[#10B981]" : "bg-white/20"}`} />
                         <span className={`text-sm font-semibold ${item.active ? "text-[#10B981]" : "text-white/85"}`} style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{item.label}</span>
@@ -641,13 +656,22 @@ function Nav({ currentPage, onNavigate }: { currentPage: Page; onNavigate: (p: P
                   {link.hasSub ? "Resources & Insights" : link.label}
                 </button>
                 {link.hasSub && (
-                  <button
-                    onClick={() => { onNavigate("blog"); setMenuOpen(false); }}
-                    className={`w-full px-3 py-2.5 text-sm hover:text-white hover:bg-white/[0.05] rounded-xl transition-colors text-left font-medium pl-7 ${currentPage === "blog" ? "text-[#10B981]" : "text-white/45"}`}
-                    style={{ fontFamily: "'Space Grotesk', sans-serif" }}
-                  >
-                    ↳ Blog
-                  </button>
+                  <>
+                    <button
+                      onClick={() => { onNavigate("guides"); setMenuOpen(false); }}
+                      className={`w-full px-3 py-2.5 text-sm hover:text-white hover:bg-white/[0.05] rounded-xl transition-colors text-left font-medium pl-7 ${currentPage === "guides" || (typeof currentPage === "string" && currentPage.startsWith("guide-")) ? "text-[#10B981]" : "text-white/45"}`}
+                      style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                    >
+                      ↳ Guides
+                    </button>
+                    <button
+                      onClick={() => { onNavigate("blog"); setMenuOpen(false); }}
+                      className={`w-full px-3 py-2.5 text-sm hover:text-white hover:bg-white/[0.05] rounded-xl transition-colors text-left font-medium pl-7 ${currentPage === "blog" || (typeof currentPage === "string" && currentPage.startsWith("article-")) ? "text-[#10B981]" : "text-white/45"}`}
+                      style={{ fontFamily: "'Space Grotesk', sans-serif" }}
+                    >
+                      ↳ Blog
+                    </button>
+                  </>
                 )}
               </div>
             ))}
@@ -4206,6 +4230,10 @@ export default function App() {
     typeof currentPage === "string" && currentPage.startsWith("article-")
       ? currentPage.replace("article-", "")
       : null;
+  const openedGuideSlug =
+    typeof currentPage === "string" && currentPage.startsWith("guide-")
+      ? currentPage.slice("guide-".length)
+      : null;
 
   return (
     <AuthProvider>
@@ -4225,6 +4253,9 @@ export default function App() {
         {currentPage === "resources" && (
           <ResourcesPageLive onNavigate={navigate} FadeUp={FadeUp} SharedFooter={SharedFooter} />
         )}
+        {currentPage === "guides" && (
+          <GuidesPageLive onNavigate={navigate} FadeUp={FadeUp} SharedFooter={SharedFooter} />
+        )}
         {currentPage === "blog" && (
           <BlogPageLive onNavigate={navigate} FadeUp={FadeUp} SharedFooter={SharedFooter} />
         )}
@@ -4233,6 +4264,9 @@ export default function App() {
         )}
         {articleSlug && (
           <ArticlePageLive articleSlug={articleSlug} onNavigate={navigate} FadeUp={FadeUp} SharedFooter={SharedFooter} />
+        )}
+        {openedGuideSlug && (
+          <GuidePageLive guideSlug={openedGuideSlug} onNavigate={navigate} FadeUp={FadeUp} SharedFooter={SharedFooter} />
         )}
         {currentPage === "partners" && <PartnersPage onNavigate={navigate} />}
         {currentPage === "visualiq" && <VisualIQPage onNavigate={navigate} />}

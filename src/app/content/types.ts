@@ -92,6 +92,10 @@ export function slugify(title: string): string {
   );
 }
 
+export function guideSlug(guide: Pick<ResourceGuide, "id" | "title">): string {
+  return slugify(guide.title) || guide.id;
+}
+
 /** Strip markdown so listing cards show normal readable text. */
 export function toPlainPreview(markdown: string, maxLength = 220): string {
   const text = (markdown || "")
