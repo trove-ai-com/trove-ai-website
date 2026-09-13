@@ -1,4 +1,5 @@
 import ReactMarkdown from "react-markdown";
+import remarkBreaks from "remark-breaks";
 
 /** Renders article body with markdown: headings, bold/italic, links, lists, images. */
 export function ArticleBody({ body }: { body: string }) {
@@ -8,7 +9,13 @@ export function ArticleBody({ body }: { body: string }) {
       style={{ fontFamily: "Inter, sans-serif" }}
     >
       <ReactMarkdown
+        remarkPlugins={[remarkBreaks]}
         components={{
+          h1: ({ children }) => (
+            <h1 className="text-3xl font-bold text-white pt-4" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+              {children}
+            </h1>
+          ),
           h2: ({ children }) => (
             <h2 className="text-2xl font-bold text-white pt-4" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
               {children}
@@ -19,7 +26,23 @@ export function ArticleBody({ body }: { body: string }) {
               {children}
             </h3>
           ),
+          h4: ({ children }) => (
+            <h4 className="text-lg font-semibold text-white/85 pt-2" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+              {children}
+            </h4>
+          ),
+          h5: ({ children }) => (
+            <h5 className="text-base font-semibold text-white/80 pt-1" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+              {children}
+            </h5>
+          ),
+          h6: ({ children }) => (
+            <h6 className="text-sm font-semibold uppercase tracking-wide text-white/70 pt-1" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
+              {children}
+            </h6>
+          ),
           p: ({ children }) => <p className="text-white/62 leading-[1.85]">{children}</p>,
+          br: () => <br />,
           strong: ({ children }) => <strong className="font-semibold text-white/85">{children}</strong>,
           em: ({ children }) => <em className="italic text-white/70">{children}</em>,
           a: ({ href, children }) => (

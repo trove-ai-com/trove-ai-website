@@ -7,6 +7,7 @@ import { BlogAdmin, emptyBlogDraft } from "./BlogAdmin";
 import { GuidesAdmin } from "./GuidesAdmin";
 import { CopyAdmin } from "./CopyAdmin";
 import { FaqsAdmin } from "./FaqsAdmin";
+import { MediaAdmin } from "./MediaAdmin";
 import type { AdminSection } from "./adminUi";
 import type { BlogPost } from "@/app/content/types";
 
@@ -90,6 +91,7 @@ function AdminDashboard({
       {section === "guides" && <GuidesAdmin />}
       {section === "copy" && <CopyAdmin />}
       {section === "faqs" && <FaqsAdmin />}
+      {section === "media" && <MediaAdmin />}
     </AdminShell>
   );
 }

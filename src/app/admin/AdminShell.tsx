@@ -6,6 +6,7 @@ import {
   FileText,
   Globe,
   HelpCircle,
+  Image,
   Lock,
   LogOut,
   Plus,
@@ -30,6 +31,7 @@ const contentNav: { id: AdminSection; label: string; icon: ReactNode }[] = [
   { id: "copy", label: "Pages", icon: <Columns className="w-4 h-4" /> },
   { id: "guides", label: "Guides", icon: <BookOpen className="w-4 h-4" /> },
   { id: "faqs", label: "FAQs", icon: <HelpCircle className="w-4 h-4" /> },
+  { id: "media", label: "Photo library", icon: <Image className="w-4 h-4" /> },
 ];
 
 export function AdminShell({
