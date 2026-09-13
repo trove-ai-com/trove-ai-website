@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ArrowRight, Camera, ChevronRight, Layers, Lock, Radio, Shield, Brain } from "lucide-react";
-import { fetchPublishedGuideBySlug, fetchPublishedGuides } from "@/app/content/api";
+import { fallbackGuides, fetchPublishedGuideBySlug, fetchPublishedGuides } from "@/app/content/api";
 import { guideSlug, toPlainPreview, type ResourceGuide } from "@/app/content/types";
 import { ArticleBody } from "@/app/blog/ArticleBody";
 
@@ -27,17 +27,13 @@ function GuideIcon({ name, className, color }: { name: string; className?: strin
 }
 
 export function GuidesPageLive({ onNavigate, FadeUp, SharedFooter }: SharedProps) {
-  const [guides, setGuides] = useState<ResourceGuide[]>([]);
+  const [guides, setGuides] = useState<ResourceGuide[]>(fallbackGuides);
   const [activeProduct, setActiveProduct] = useState("All");
   const [activeTag, setActiveTag] = useState("All");
   const [activeType, setActiveType] = useState("All");
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchPublishedGuides().then((data) => {
-      setGuides(data);
-      setLoading(false);
-    });
+    fetchPublishedGuides().then(setGuides);
   }, []);
 
   const productFilters = ["All", ...Array.from(new Set(guides.map((g) => g.product).filter(Boolean)))];
@@ -49,14 +45,6 @@ export function GuidesPageLive({ onNavigate, FadeUp, SharedFooter }: SharedProps
     .filter((g) => activeType === "All" || g.type === activeType);
   const featured = guides[0];
   const filtersActive = activeProduct !== "All" || activeTag !== "All" || activeType !== "All";
-
-  if (loading) {
-    return (
-      <div className="min-h-screen pt-24 bg-[#040D1A] flex items-center justify-center">
-        <p className="text-white/40 text-sm">Loading guides…</p>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen pt-16 bg-[#040D1A]">

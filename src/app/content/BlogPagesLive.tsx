@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { ArrowRight, ChevronRight } from "lucide-react";
-import { fetchBlogPostBySlug, fetchPublishedBlogPosts } from "@/app/content/api";
+import { fetchBlogPostBySlug, fetchPublishedBlogPosts, getFallbackBlogPosts } from "@/app/content/api";
 import { blogCardPreview, POST_TYPE_LABELS, POST_TYPE_OPTIONS, type BlogPost, type PostType } from "@/app/content/types";
 import { ArticleBody } from "@/app/blog/ArticleBody";
 
@@ -13,17 +13,13 @@ type SharedProps = {
 };
 
 export function BlogPageLive({ onNavigate, FadeUp, SharedFooter }: SharedProps) {
-  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [posts, setPosts] = useState<BlogPost[]>(getFallbackBlogPosts);
   const [activeProduct, setActiveProduct] = useState("All");
   const [activeTag, setActiveTag] = useState("All");
   const [activeType, setActiveType] = useState<"All" | PostType>("All");
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchPublishedBlogPosts().then((data) => {
-      setPosts(data);
-      setLoading(false);
-    });
+    fetchPublishedBlogPosts().then(setPosts);
   }, []);
 
   const productFilters = ["All", ...Array.from(new Set(posts.map((a) => a.product).filter(Boolean)))];
@@ -34,14 +30,6 @@ export function BlogPageLive({ onNavigate, FadeUp, SharedFooter }: SharedProps) 
     .filter((a) => activeType === "All" || (a.post_type || "insight") === activeType);
   const featured = posts[0];
   const filtersActive = activeProduct !== "All" || activeTag !== "All" || activeType !== "All";
-
-  if (loading) {
-    return (
-      <div className="min-h-screen pt-24 bg-[#040D1A] flex items-center justify-center">
-        <p className="text-white/40 text-sm">Loading blog…</p>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen pt-16 bg-[#040D1A]">
