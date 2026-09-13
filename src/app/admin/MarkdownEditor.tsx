@@ -2,11 +2,15 @@ import { useEffect, useRef, useState, type TextareaHTMLAttributes } from "react"
 import {
   Bold,
   Italic,
+  Heading1,
   Heading2,
   Heading3,
+  Heading4,
   Link2,
   List,
   ListOrdered,
+  Quote,
+  CornerDownLeft,
   ImagePlus,
   Loader2,
   Maximize2,
@@ -92,23 +96,116 @@ export function MarkdownEditor({
     });
   }
 
-  function insertLinePrefix(prefix: string) {
+  function applyToSelectedLines(transform: (lines: string[]) => string[]) {
     const el = ref.current;
     if (!el) {
-      onChange(`${value}${value.endsWith("\n") || !value ? "" : "\n"}${prefix}`);
+      onChange(transform([value || ""]).join("\n"));
       return;
     }
     const start = el.selectionStart;
-    const lineStart = value.lastIndexOf("\n", start - 1) + 1;
-    const before = value.slice(0, lineStart);
-    const after = value.slice(lineStart);
-    const next = before + prefix + after;
+    const end = el.selectionEnd;
+    const from = value.lastIndexOf("\n", start - 1) + 1;
+    const newlineAfter = value.indexOf("\n", end);
+    const to = newlineAfter === -1 ? value.length : newlineAfter;
+    const nextBlock = transform(value.slice(from, to).split("\n")).join("\n");
+    onChange(value.slice(0, from) + nextBlock + value.slice(to));
+    requestAnimationFrame(() => {
+      el.focus();
+      el.setSelectionRange(from, from + nextBlock.length);
+    });
+  }
+
+  function applyHeading(level: 1 | 2 | 3 | 4) {
+    const prefix = `${"#".repeat(level)} `;
+    applyToSelectedLines((lines) =>
+      lines.map((line) => {
+        const stripped = line.replace(/^#{1,6}\s+/, "").replace(/^[-*]\s+/, "").replace(/^\d+\.\s+/, "");
+        return prefix + (stripped || "Heading");
+      })
+    );
+  }
+
+  function toggleBullet() {
+    applyToSelectedLines((lines) => {
+      const allBullets = lines.every((line) => !line.trim() || /^[-*]\s/.test(line));
+      if (allBullets) return lines.map((line) => line.replace(/^[-*]\s+/, ""));
+      return lines.map((line) => {
+        if (!line.trim()) return line;
+        return `- ${line.replace(/^#{1,6}\s+/, "").replace(/^\d+\.\s+/, "").replace(/^[-*]\s+/, "")}`;
+      });
+    });
+  }
+
+  function toggleNumbered() {
+    applyToSelectedLines((lines) => {
+      const allNumbered = lines.every((line) => !line.trim() || /^\d+\.\s/.test(line));
+      if (allNumbered) return lines.map((line) => line.replace(/^\d+\.\s+/, ""));
+      let n = 1;
+      return lines.map((line) => {
+        if (!line.trim()) return line;
+        const text = line.replace(/^#{1,6}\s+/, "").replace(/^\d+\.\s+/, "").replace(/^[-*]\s+/, "");
+        return `${n++}. ${text}`;
+      });
+    });
+  }
+
+  function insertLineBreak() {
+    const el = ref.current;
+    if (!el) {
+      onChange(`${value}\n`);
+      return;
+    }
+    const start = el.selectionStart;
+    const end = el.selectionEnd;
+    const next = `${value.slice(0, start)}\n${value.slice(end)}`;
     onChange(next);
     requestAnimationFrame(() => {
       el.focus();
-      const pos = lineStart + prefix.length;
-      el.setSelectionRange(pos, pos);
+      el.setSelectionRange(start + 1, start + 1);
     });
+  }
+
+  function continueListOnEnter(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    const el = ref.current;
+    if (!el) return false;
+    const start = el.selectionStart;
+    const lineStart = value.lastIndexOf("\n", start - 1) + 1;
+    const line = value.slice(lineStart, start);
+    const emptyItem = /^(?:[-*]\s+|\d+\.\s+)$/.test(line);
+    if (emptyItem) {
+      e.preventDefault();
+      const next = value.slice(0, lineStart) + value.slice(start);
+      onChange(next);
+      requestAnimationFrame(() => {
+        el.focus();
+        el.setSelectionRange(lineStart, lineStart);
+      });
+      return true;
+    }
+    const numbered = line.match(/^(\d+)\.\s+/);
+    if (numbered) {
+      e.preventDefault();
+      const nextPrefix = `\n${Number(numbered[1]) + 1}. `;
+      const next = value.slice(0, start) + nextPrefix + value.slice(el.selectionEnd);
+      onChange(next);
+      requestAnimationFrame(() => {
+        el.focus();
+        const pos = start + nextPrefix.length;
+        el.setSelectionRange(pos, pos);
+      });
+      return true;
+    }
+    if (/^[-*]\s+/.test(line)) {
+      e.preventDefault();
+      const next = `${value.slice(0, start)}\n- ${value.slice(el.selectionEnd)}`;
+      onChange(next);
+      requestAnimationFrame(() => {
+        el.focus();
+        el.setSelectionRange(start + 3, start + 3);
+      });
+      return true;
+    }
+    return false;
   }
 
   const tools: { label: string; title: string; Icon: typeof Bold; action: () => void }[] = [
@@ -125,16 +222,28 @@ export function MarkdownEditor({
       action: () => applyWrap({ prefix: "*", placeholder: "italic text" }),
     },
     {
+      label: "H1",
+      title: "Title",
+      Icon: Heading1,
+      action: () => applyHeading(1),
+    },
+    {
       label: "H2",
       title: "Heading",
       Icon: Heading2,
-      action: () => applyWrap({ prefix: "## ", suffix: "", placeholder: "Heading", block: true }),
+      action: () => applyHeading(2),
     },
     {
       label: "H3",
       title: "Subheading",
       Icon: Heading3,
-      action: () => applyWrap({ prefix: "### ", suffix: "", placeholder: "Subheading", block: true }),
+      action: () => applyHeading(3),
+    },
+    {
+      label: "H4",
+      title: "Small heading",
+      Icon: Heading4,
+      action: () => applyHeading(4),
     },
     {
       label: "Link",
@@ -144,15 +253,30 @@ export function MarkdownEditor({
     },
     {
       label: "List",
-      title: "Bullet list",
+      title: "Bullet list — select several lines to convert them all",
       Icon: List,
-      action: () => insertLinePrefix("- "),
+      action: toggleBullet,
     },
     {
       label: "Numbered",
-      title: "Numbered list",
+      title: "Numbered list — select several lines to number them 1, 2, 3",
       Icon: ListOrdered,
-      action: () => insertLinePrefix("1. "),
+      action: toggleNumbered,
+    },
+    {
+      label: "Quote",
+      title: "Quote",
+      Icon: Quote,
+      action: () =>
+        applyToSelectedLines((lines) =>
+          lines.map((line) => (line.startsWith("> ") ? line.slice(2) : `> ${line || "quote"}`))
+        ),
+    },
+    {
+      label: "Break",
+      title: "Insert a line break",
+      Icon: CornerDownLeft,
+      action: insertLineBreak,
     },
     {
       label: "Image",
@@ -191,6 +315,9 @@ export function MarkdownEditor({
   }
 
   function onKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (e.key === "Enter" && !e.shiftKey && !e.metaKey && !e.ctrlKey) {
+      if (continueListOnEnter(e)) return;
+    }
     const mod = e.metaKey || e.ctrlKey;
     if (!mod) return;
     if (e.key.toLowerCase() === "b") {
@@ -209,7 +336,7 @@ export function MarkdownEditor({
     onKeyDown,
     placeholder:
       placeholder ||
-      "Write with markdown. Use the toolbar for bold, italic, headings, links, and lists.\n\nSeparate paragraphs with a blank line.",
+      "Write the article here. Use the toolbar for headings, lists, and line breaks.\n\nEnter starts a new line. Enter twice starts a new paragraph. In a list, Enter adds the next item.",
     className: `w-full rounded-b-xl bg-[#071528] border border-t-0 border-white/[0.08] px-5 py-4 text-[15px] leading-7 text-white/85 placeholder:text-white/25 focus:outline-none focus:border-[#1B6FE8]/50 font-mono ${
       expanded ? "resize-none overflow-y-auto" : "resize-y"
     } ${heightClass}`,
@@ -290,10 +417,8 @@ export function MarkdownEditor({
       )}
 
       <p className="mt-2 text-[11px] text-white/30" style={{ fontFamily: "Inter, sans-serif" }}>
-        Formatting uses markdown: <code className="text-white/45">**bold**</code>,{" "}
-        <code className="text-white/45">*italic*</code>, <code className="text-white/45">## heading</code>,{" "}
-        <code className="text-white/45">[link](url)</code>, <code className="text-white/45">- list</code>,{" "}
-        <code className="text-white/45">1. numbered</code>. Press Enter for a line break.
+        Headings: H1–H4. Select several lines, then Numbered, to make 1 / 2 / 3. Enter adds a visible
+        line break; Enter again starts a new paragraph. Enter in a list continues 2, 3, 4…
       </p>
     </div>
   );
