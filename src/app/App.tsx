@@ -155,63 +155,63 @@ const industryDetails: Record<string, {
   useCases: string[];
   recommended: string[];
   workflow: string;
-  metric: { value: string; label: string }[];
+  metric: string[];
 }> = {
   Government: {
     pain: "Agencies face exploding data volumes from siloed systems that cannot correlate signals in real time, leaving critical threats undetected.",
     useCases: ["Situational awareness command centers", "Cross-agency threat intelligence fusion", "Physical security monitoring", "Cyber incident response"],
     recommended: ["VisualIQ", "DeepSenseIQ", "CyberIQ", "LEXSO"],
     workflow: "Ingest → Correlate → Alert → Authorize",
-    metric: [{ value: "47", label: "Federal Agency Deployments" }, { value: "<30s", label: "Mean Time to Alert" }],
+    metric: ["Number of Federal Agency Deployments", "Mean Time to Alert"],
   },
   Defense: {
     pain: "Mission-critical environments demand AI that operates fully offline, explains its reasoning, and integrates with existing hardware without rip-and-replace.",
     useCases: ["Base perimeter security", "Multi-sensor fusion at the edge", "Secure communications", "Intelligence analytics"],
     recommended: ["DeepSenseIQ", "VellumGuard", "LEXSO", "CyberIQ"],
     workflow: "Sense → Classify → Decide → Report",
-    metric: [{ value: "Air-gap", label: "Deployment Capable" }, { value: "Edge", label: "Processing Model" }],
+    metric: ["Air-gap Deployment Capability", "Edge Processing Model Status"],
   },
   Healthcare: {
     pain: "Clinical environments need AI that improves patient safety without adding burden to already-stretched staff or creating compliance exposure.",
     useCases: ["Patient behavioral monitoring", "Elopement prevention", "Fall risk detection", "Medication compliance"],
     recommended: ["CareIQ", "VisualIQ", "VellumGuard"],
     workflow: "Monitor → Detect → Alert → Resolve",
-    metric: [{ value: "HIPAA", label: "Compliant" }, { value: "62%", label: "Reduction in Incidents" }],
+    metric: ["HIPAA Compliance", "Reduction in Incidents"],
   },
   Education: {
     pain: "Schools need safety tools that are unobtrusive, explainable, and respect student privacy while giving administrators early warning signals.",
     useCases: ["Campus perimeter monitoring", "Threat assessment workflows", "Behavioral early warning", "Emergency response coordination"],
     recommended: ["CareIQ", "VisualIQ", "LEXSO"],
     workflow: "Observe → Assess → Notify → Respond",
-    metric: [{ value: "FERPA", label: "Privacy Compliant" }, { value: "Real-time", label: "Alert Delivery" }],
+    metric: ["FERPA Privacy Compliance", "Real-time Alert Delivery"],
   },
   Infrastructure: {
     pain: "Critical infrastructure faces increasingly complex physical-cyber attack surfaces that overwhelm human security teams operating legacy tools.",
     useCases: ["Facility perimeter intelligence", "OT network monitoring", "Anomaly detection at the edge", "Incident command workflows"],
     recommended: ["VisualIQ", "DeepSenseIQ", "CyberIQ", "LEXSO"],
     workflow: "Detect → Correlate → Prioritize → Contain",
-    metric: [{ value: "NERC CIP", label: "Aligned" }, { value: "99.97%", label: "Platform Uptime" }],
+    metric: ["NERC CIP Alignment", "Platform Uptime"],
   },
   Commercial: {
     pain: "Enterprise organizations struggle to translate vast security data into actionable intelligence and justify ROI to the board.",
     useCases: ["Corporate security intelligence", "Loss prevention analytics", "Insider threat detection", "Compliance monitoring"],
     recommended: ["VisualIQ", "CyberIQ", "DeepSenseIQ"],
     workflow: "Collect → Analyze → Score → Report",
-    metric: [{ value: "API-first", label: "Integration Model" }, { value: "Modular", label: "Deployment" }],
+    metric: ["API-first Integration Model", "Modular Deployment"],
   },
   Financial: {
     pain: "Financial institutions need AI that operates in regulated environments, explains every decision, and scales across complex distributed networks.",
     useCases: ["Fraud detection and risk scoring", "Insider threat monitoring", "Physical branch security", "Cyber risk management"],
     recommended: ["CyberIQ", "VellumGuard", "VisualIQ"],
     workflow: "Ingest → Score → Explain → Audit",
-    metric: [{ value: "PCI-DSS", label: "Compliant" }, { value: "Full", label: "Audit Trail" }],
+    metric: ["PCI-DSS Compliance", "Audit Trail Accuracy"],
   },
   Manufacturing: {
     pain: "Industrial environments have massive OT/IT convergence challenges with legacy systems never designed for AI-native security or intelligence.",
     useCases: ["Operational safety monitoring", "Equipment anomaly detection", "Access control intelligence", "Supply chain integrity"],
     recommended: ["DeepSenseIQ", "VisualIQ", "CyberIQ"],
     workflow: "Sense → Detect → Alert → Dispatch",
-    metric: [{ value: "ICS/SCADA", label: "Aware" }, { value: "Edge", label: "Deployment Ready" }],
+    metric: ["ICS/SCADA Awareness", "Edge Deployment Readiness"],
   },
 };
 
@@ -1872,9 +1872,8 @@ function IndustriesPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
                       </h4>
                       <div className="flex gap-4">
                         {detail.metric.map((m) => (
-                          <div key={m.label} className="bg-[#F5F7FB] rounded-xl px-4 py-3 border border-[#E8EDF4]">
-                            <div className="text-xl font-bold text-[#1B6FE8]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>{m.value}</div>
-                            <div className="text-[10px] text-[#6B7280] mt-0.5" style={{ fontFamily: "Inter, sans-serif" }}>{m.label}</div>
+                          <div key={m} className="flex-1 bg-[#F5F7FB] rounded-xl px-4 py-3 border border-[#E8EDF4]">
+                            <div className="text-sm font-medium text-[#374151] leading-snug" style={{ fontFamily: "Inter, sans-serif" }}>{m}</div>
                           </div>
                         ))}
                       </div>
@@ -2646,7 +2645,7 @@ function PartnersPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
                 Select partners.<br /><span className="text-[#1B6FE8]">Deeper integration.</span>
               </h1>
               <p className="mt-6 text-white/50 text-lg leading-relaxed max-w-2xl" style={{ fontFamily: "Inter, sans-serif" }}>
-                Trove-AI&apos;s ecosystem includes Constellis, QumulusAI, and sister initiatives LomaHipe and DScern — extending secure AI into physical security, infrastructure, health data trust, and national security missions.
+                Trove-AI&apos;s ecosystem includes Constellis and QumulusAI, along with two sister initiatives, LomaHipe and DScern, working in physical security, infrastructure, health data trust, and national security.
               </p>
               <p className="mt-3 text-white/42 text-sm leading-relaxed max-w-xl" style={{ fontFamily: "Inter, sans-serif" }}>
                 Trove-AI works with select partners to extend its products into markets and infrastructure it does not serve alone.
@@ -2790,13 +2789,13 @@ function PartnersPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
               <div>
                 <p className="text-[10px] font-bold tracking-[0.24em] uppercase text-white/42 mb-3" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Partnership philosophy</p>
                 <h2 className="text-3xl font-bold text-white mb-4 leading-snug" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                  We partner selectively,<br />not broadly.
+                  We partner selectively.
                 </h2>
                 <p className="text-white/42 text-sm leading-relaxed mb-4" style={{ fontFamily: "Inter, sans-serif" }}>
-                  Trove-AI doesn't maintain a partner directory or a reseller channel. Every partner relationship is a co-development, integration, or infrastructure arrangement, one that extends a Trove-AI product into a context it couldn't reach alone.
+                  Trove-AI doesn&apos;t have a partner directory or a reseller channel. Every partnership is a co-development, integration, or infrastructure arrangement that puts a Trove-AI product to work in a context we couldn&apos;t reach alone.
                 </p>
                 <p className="text-white/42 text-sm leading-relaxed" style={{ fontFamily: "Inter, sans-serif" }}>
-                  This keeps the ecosystem small, accountable, and technically coherent. Partners don't resell Trove-AI. They build with it.
+                  This keeps the ecosystem small and easy to stand behind.
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -2832,7 +2831,7 @@ function PartnersPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
                   Interested in partnering<br />with Trove-AI?
                 </h2>
                 <p className="text-white/40 text-sm leading-relaxed" style={{ fontFamily: "Inter, sans-serif" }}>
-                  If your organization is building infrastructure, delivering security operations, or operating in healthcare data, and you see an opportunity to work alongside a Trove-AI product, we're open to the conversation.
+                  If you think there&apos;s a good fit between what you&apos;re building and what we&apos;re building, we&apos;d love to talk.
                 </p>
               </div>
               <div className="relative z-10 flex flex-col items-start lg:items-end gap-4">
@@ -2848,9 +2847,6 @@ function PartnersPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
                 >
                   Get in touch <ArrowRight className="w-4 h-4" />
                 </button>
-                <p className="text-[11px] text-white/40 text-right" style={{ fontFamily: "Inter, sans-serif" }}>
-                  No partner portals. No channel programs.<br />Just a direct conversation.
-                </p>
               </div>
             </div>
           </FadeUp>
