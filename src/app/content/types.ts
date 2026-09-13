@@ -91,3 +91,31 @@ export function slugify(title: string): string {
       .slice(0, 80) || "untitled"
   );
 }
+
+/** Strip markdown so listing cards show normal readable text. */
+export function toPlainPreview(markdown: string, maxLength = 220): string {
+  const text = (markdown || "")
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/!\[([^\]]*)\]\([^)]+\)/g, "$1")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/^#{1,6}\s+/gm, "")
+    .replace(/^>\s+/gm, "")
+    .replace(/^[-*+]\s+/gm, "")
+    .replace(/^\d+\.\s+/gm, "")
+    .replace(/(\*\*|__)(.*?)\1/g, "$2")
+    .replace(/(\*|_)(.*?)\1/g, "$2")
+    .replace(/~~(.*?)~~/g, "$1")
+    .replace(/[_*#>`]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!text) return "";
+  if (text.length <= maxLength) return text;
+  const cut = text.slice(0, maxLength);
+  const lastSpace = cut.lastIndexOf(" ");
+  return `${(lastSpace > 80 ? cut.slice(0, lastSpace) : cut).trim()}…`;
+}
+
+export function blogCardPreview(post: { excerpt?: string; body?: string }, maxLength = 220): string {
+  return toPlainPreview((post.excerpt || "").trim() || post.body || "", maxLength);
+}

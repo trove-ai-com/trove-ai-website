@@ -14,6 +14,7 @@ import { AdminPage } from "@/app/admin/AdminPage";
 import { AuthProvider } from "@/app/admin/AuthProvider";
 import { ResourcesPageLive } from "@/app/content/ResourcesPageLive";
 import { ArticlePageLive, BlogPageLive } from "@/app/content/BlogPagesLive";
+import { blogCardPreview } from "@/app/content/types";
 import { ContactPage } from "@/app/contact/ContactPage";
 import { openContact } from "@/app/contact/openContact";
 
@@ -527,7 +528,7 @@ function Nav({ currentPage, onNavigate }: { currentPage: Page; onNavigate: (p: P
                   <div className="w-60 bg-[#071528] border border-white/[0.10] rounded-xl overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.6)]">
                     {([
                       { label: "Resources & Insights", page: "resources" as Page, desc: "Comparison guides & FAQ", active: currentPage === "resources" },
-                      { label: "Blog", page: "blog" as Page, desc: "Monthly articles: Insights index", active: currentPage === "blog" },
+                      { label: "Blog", page: "blog" as Page, desc: "Weekly articles", active: currentPage === "blog" },
                     ] as { label: string; page: Page; desc: string; active: boolean }[]).map((item, i) => (
                       <button
                         key={item.page}
@@ -2118,7 +2119,7 @@ function ResourcesPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
         </div>
       </section>
 
-      {/* ── Insights blog index link ──────────────────────────────────────── */}
+      {/* ── Blog index link ──────────────────────────────────────── */}
       <section className="py-12 border-b border-white/[0.06]">
         <div className="max-w-7xl mx-auto px-6">
           <FadeUp>
@@ -2132,14 +2133,14 @@ function ResourcesPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
                 </div>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-[#10B981]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Insights</p>
+                    <p className="text-[10px] font-bold tracking-[0.22em] uppercase text-[#10B981]" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Blog</p>
                     <span className="text-[10px] text-white/38 border border-white/[0.08] rounded px-1.5 py-0.5" style={{ fontFamily: "'JetBrains Mono', monospace" }}>blog index</span>
                   </div>
                   <h3 className="text-lg font-bold text-white group-hover:text-[#10B981] transition-colors" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                    Monthly articles on AI security, physical security, and cyber intelligence
+                    Articles on AI that matters.
                   </h3>
                   <p className="text-sm text-white/38 mt-1" style={{ fontFamily: "Inter, sans-serif" }}>
-                    One new article per month, rotating across all Trove-AI product lines and industries.
+                    Weekly pieces on AI development, physical security, and cyber intelligence topics across Trove-AI's product lines.
                   </p>
                 </div>
               </div>
@@ -2241,7 +2242,7 @@ function ArticlePage({ articleId, onNavigate }: { articleId: number; onNavigate:
                 className="inline-flex items-center gap-1.5 text-[11px] font-medium text-white/42 hover:text-white/55 transition-colors mb-7"
                 style={{ fontFamily: "'Space Grotesk', sans-serif" }}
               >
-                <ChevronRight className="w-3 h-3 rotate-180" /> Insights
+                <ChevronRight className="w-3 h-3 rotate-180" /> Blog
               </button>
               <div className="flex items-center gap-3 mb-5">
                 <span className="text-[10px] font-bold tracking-widest uppercase px-3 py-1 rounded-full" style={{ background: `${article.productColor}18`, color: article.productColor, fontFamily: "'Space Grotesk', sans-serif" }}>
@@ -2344,15 +2345,12 @@ function BlogPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
               </button>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-end">
                 <div>
-                  <p className="text-[10px] font-bold tracking-[0.28em] uppercase text-[#10B981] mb-5" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Insights</p>
+                  <p className="text-[10px] font-bold tracking-[0.28em] uppercase text-[#10B981] mb-5" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>Blog</p>
                   <h1 className="text-5xl md:text-[3.75rem] font-bold text-white leading-[1.04] tracking-tight" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
-                    Monthly articles on<br /><span className="text-[#10B981]">AI that matters.</span>
+                    Articles on<br /><span className="text-[#10B981]">AI that matters.</span>
                   </h1>
                   <p className="mt-6 text-white/48 text-base leading-relaxed max-w-lg" style={{ fontFamily: "Inter, sans-serif" }}>
-                    Monthly articles on AI security, physical security, and cyber intelligence topics across Trove-AI's product lines.
-                  </p>
-                  <p className="mt-3 text-white/40 text-sm leading-relaxed max-w-lg" style={{ fontFamily: "Inter, sans-serif" }}>
-                    Insights is Trove-AI's ongoing content index, with one new article published monthly, rotating across product lines and industries.
+                    Weekly pieces on AI development, physical security, and cyber intelligence topics across Trove-AI's product lines.
                   </p>
                   <div className="mt-8 flex flex-wrap items-center gap-4">
                     <button
@@ -2368,7 +2366,7 @@ function BlogPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
                 </div>
                 <div className="hidden lg:flex flex-col items-end justify-end gap-1.5">
                   <span className="text-[11px] text-white/38" style={{ fontFamily: "'JetBrains Mono', monospace" }}>{allInsights.length} articles published</span>
-                  <span className="text-[11px] text-white/38" style={{ fontFamily: "'JetBrains Mono', monospace" }}>1 new article / month</span>
+                  <span className="text-[11px] text-white/38" style={{ fontFamily: "'JetBrains Mono', monospace" }}>Weekly pieces</span>
                   <span className="text-[11px] text-white/38" style={{ fontFamily: "'JetBrains Mono', monospace" }}>6 product lines covered</span>
                 </div>
               </div>
@@ -2401,8 +2399,7 @@ function BlogPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
                 <h2 className="text-3xl md:text-4xl font-bold text-white leading-[1.12] mb-5 group-hover:text-[#10B981] transition-colors" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                   {allInsights[0].title}
                 </h2>
-                <p className="text-white/48 leading-relaxed mb-4" style={{ fontFamily: "Inter, sans-serif" }}>{allInsights[0].excerpt}</p>
-                <p className="text-white/42 leading-relaxed text-sm border-t border-white/[0.05] pt-4 line-clamp-4" style={{ fontFamily: "Inter, sans-serif" }}>{allInsights[0].body.split(/\n\n+/)[0]}</p>
+                <p className="text-white/48 leading-relaxed mb-4" style={{ fontFamily: "Inter, sans-serif" }}>{blogCardPreview(allInsights[0], 280)}</p>
                 <div className="mt-8 flex items-center gap-2 text-sm font-semibold text-[#10B981] group-hover:gap-3 transition-all" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                   Read article <ArrowRight className="w-4 h-4" />
                 </div>
@@ -2469,7 +2466,7 @@ function BlogPage({ onNavigate }: { onNavigate: (p: Page) => void }) {
                     <h3 className="font-bold text-white leading-snug mb-3 group-hover:text-[#10B981] transition-colors" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>
                       {article.title}
                     </h3>
-                    <p className="text-sm text-white/35 leading-relaxed mb-4 flex-1" style={{ fontFamily: "Inter, sans-serif" }}>{article.excerpt}</p>
+                    <p className="text-sm text-white/35 leading-relaxed mb-4 flex-1" style={{ fontFamily: "Inter, sans-serif" }}>{blogCardPreview(article)}</p>
                     <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/[0.05]">
                       <div className="flex gap-1.5 flex-wrap">
                         {article.tags.slice(0, 2).map((tag) => (
