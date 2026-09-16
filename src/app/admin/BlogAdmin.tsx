@@ -118,7 +118,7 @@ function BlogList({
       await load();
     } catch (e) {
       setError(true);
-      setStatus(e instanceof Error ? e.message : "Update failed");
+      setStatus(e instanceof Error ? e.message : String(e) || "Update failed");
     }
   }
 
@@ -392,7 +392,7 @@ function BlogEditor({
       }
     } catch (e) {
       setError(true);
-      setStatusMsg(e instanceof Error ? e.message : "Save failed");
+      setStatusMsg(e instanceof Error ? e.message : String(e) || "Save failed");
     }
     setBusy(false);
   }
