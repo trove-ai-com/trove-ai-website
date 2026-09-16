@@ -217,26 +217,83 @@ export async function fetchPublishedFaqs(): Promise<ResourceFaq[]> {
 
 // ─── Admin CRUD ─────────────────────────────────────────────────────────────
 
-export async function adminListBlogPosts(): Promise<BlogPost[]> {
+function toAdminError(error: unknown, fallback = "Save failed"): Error {
+  if (error instanceof Error && error.message) return error;
+  if (error && typeof error === "object") {
+    const e = error as { message?: string; details?: string; hint?: string; code?: string };
+    const parts = [e.message, e.details, e.hint].filter(Boolean);
+    if (parts.length) return new Error(parts.join(" — "));
+  }
+  return new Error(fallback);
+}
+
+async function requireAdminClient() {
   const sb = getSupabase();
   if (!sb) throw new Error("Supabase is not configured");
+  const { data } = await sb.auth.getSession();
+  if (!data.session) throw new Error("Your sign-in expired. Sign out and sign in again, then save.");
+  return sb;
+}
+
+function isMissingColumn(error: { message?: string; code?: string }, column: string) {
+  const msg = `${error.message || ""} ${error.code || ""}`;
+  return /PGRST204/i.test(msg) || new RegExp(`Could not find the '${column}' column`, "i").test(msg);
+}
+
+function blogWriteRow(post: Partial<BlogPost> & { title: string; slug: string }, includePostType = true) {
+  const row: Record<string, unknown> = {
+    slug: post.slug,
+    title: post.title,
+    product: post.product || "DeepSense",
+    product_color: post.product_color || PRODUCT_COLORS[post.product ?? ""] || "#1B6FE8",
+    image_url: post.image_url || "",
+    excerpt: post.excerpt || "",
+    body: post.body || "",
+    date_label: post.date_label || "",
+    read_time: post.read_time || "5 min",
+    tags: Array.isArray(post.tags) ? post.tags : [],
+    published: Boolean(post.published),
+  };
+  if (includePostType) row.post_type = post.post_type || "insight";
+  return row;
+}
+
+export async function adminListBlogPosts(): Promise<BlogPost[]> {
+  const sb = await requireAdminClient();
   const { data, error } = await sb.from("blog_posts").select("*").order("created_at", { ascending: false });
-  if (error) throw error;
+  if (error) throw toAdminError(error, "Failed to load posts");
   return (data ?? []) as BlogPost[];
 }
 
 export async function adminUpsertBlogPost(
   post: Partial<BlogPost> & { title: string; slug: string }
 ): Promise<BlogPost> {
-  const sb = getSupabase();
-  if (!sb) throw new Error("Supabase is not configured");
-  const payload = {
-    ...post,
-    product_color: post.product_color || PRODUCT_COLORS[post.product ?? ""] || "#1B6FE8",
-    tags: post.tags ?? [],
-  };
-  const { data, error } = await sb.from("blog_posts").upsert(payload).select().single();
-  if (error) throw error;
+  const sb = await requireAdminClient();
+  const id = post.id?.trim();
+
+  async function write(includePostType: boolean) {
+    const row = blogWriteRow(post, includePostType);
+    if (id) {
+      return sb.from("blog_posts").update(row).eq("id", id).select().single();
+    }
+    return sb.from("blog_posts").insert(row).select().single();
+  }
+
+  let { data, error } = await write(true);
+  if (error && isMissingColumn(error, "post_type")) {
+    ({ data, error } = await write(false));
+  }
+  if (error) {
+    const err = toAdminError(error);
+    if (/duplicate key|unique constraint|already exists/i.test(err.message)) {
+      throw new Error("That URL slug is already used. Change the slug and try again.");
+    }
+    if (/row-level security|42501|permission/i.test(err.message)) {
+      throw new Error("Save was blocked by database permissions. Confirm you are signed in as an admin user.");
+    }
+    throw err;
+  }
+  if (!data) throw new Error("Save failed — no row returned. Sign in again and retry.");
   return data as BlogPost;
 }
 
